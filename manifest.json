@@ -1,0 +1,15 @@
+{
+  "name": "Basket Hub Placar",
+  "short_name": "BasketHub",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1A1A1B",
+  "theme_color": "#FF8C00",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/889/889442.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
