@@ -67,3 +67,18 @@
     border: 1px solid var(--cor2);
     color: var(--cor2);
 }
+
+body{
+background-color:rgb(175, 121, 50);
+}
+
+a{
+text-decoration: none;
+color: rgb(201, 187, 177);
+}
+.logo{
+color: rgb(73, 7, 5);
+background-color: rgba(245, 245, 245, 0.164);
+padding: 25px 40px;
+border-radius: 15px;
+}
