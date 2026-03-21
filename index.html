@@ -1,65 +1,46 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Placar de Basquete Profissional</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+    <link rel="stylesheet" href="inicio.css">
 </head>
 <body>
-    <main class="scoreboard-container">
-        <section class="team home">
-            <h2 contenteditable="true">CASA</h2>
-            <div class="score" id="score-home">00</div>
-            <div class="controls">
-                <button onclick="addPoints('home', 1)">+1</button>
-                <button onclick="addPoints('home', 2)">+2</button>
-                <button onclick="addPoints('home', 3)">+3</button>
+    <section id="home-screen" class="screen">
+        <div class="home-content">
+            <h1 class="logo">BASKET <span style="color: var(--cor2);">HUB</span></h1>
+            <p>Selecione uma ferramenta para começar</p>
+            
+            <a href="placar.html">
+                <div class="menu-grid">
+                    <button class="menu-btn" onclick="showScreen('scoreboard-screen')">
+                        <span class="icon">🏀</span>
+                        PLANCAR DIGITAL
+                    </button>
+            </a>
+                
+                <button class="menu-btn disabled">
+                    <span class="icon">📊</span>
+                    ESTATÍSTICAS (EM BREVE)
+                </button>
+                
+                <button class="menu-btn disabled">
+                    <span class="icon">⏱️</span>
+                    TREINAMENTO (EM BREVE)
+                </button>
             </div>
-            <div class="fouls">
-                Faltas: <span id="fouls-home">0</span>
-                <br>
-                <button onclick="changeFouls('home', 1)">+</button>
-                <button onclick="changeFouls('home', -1)">-</button>
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="timer">
-            <div class="period-container">
-                <h3>PERÍODO</h3>
-                <div id="display-period">1º</div>
-                <button onclick="changePeriod()">PRÓX. QUARTO</button>
-            </div>
+    <section id="scoreboard-screen" class="screen" style="display: none;">
+        <button class="back-btn" onclick="showScreen('home-screen')">← VOLTAR</button>
+        
+        <main class="scoreboard-container">
+            </main>
+    </section>
 
-            <div class="game-time">
-                <div id="display-timer">10:00</div>
-                <div class="timer-adjust">
-                    <button onclick="adjustTime(60)">+1m</button>
-                    <button onclick="adjustTime(-60)">-1m</button>
-                </div>
-                <div class="timer-controls">
-                    <button id="start-pause">INICIAR</button>
-                    <button id="reset-timer">RESET TOTAL</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="team guest">
-            <h2 contenteditable="true">VISITANTE</h2>
-            <div class="score" id="score-guest">00</div>
-            <div class="controls">
-                <button onclick="addPoints('guest', 1)">+1</button>
-                <button onclick="addPoints('guest', 2)">+2</button>
-                <button onclick="addPoints('guest', 3)">+3</button>
-            </div>
-            <div class="fouls">
-                Faltas: <span id="fouls-guest">0</span>
-                <br>
-                <button onclick="changeFouls('guest', 1)">+</button>
-                <button onclick="changeFouls('guest', -1)">-</button>
-            </div>
-        </section>
-    </main>
     <script src="script.js"></script>
+
 </body>
 </html>

@@ -1,30 +1,27 @@
-let tempoRestante = 600; 
+
+// 1. Variáveis de Estado
+
+
+let tempoRestante = 600; // 10 minutos padrão
 let cronometro = null;
 let rodando = false;
 let periodoAtual = 1;
-let timeSelecionado = 'home'; // Para o input de pontos customizados
 
+// 2. Elementos do DOM
 const displayTempo = document.getElementById('display-timer');
+const displayHome = document.getElementById('score-home');
+const displayGuest = document.getElementById('score-guest');
+const displayPeriod = document.getElementById('display-period');
 const btnStart = document.getElementById('start-pause');
 
-// Alternar seleção de time para o input customizado
-document.getElementById('score-home').onclick = () => { timeSelecionado = 'home'; alert("Time CASA selecionado para pontos extras"); };
-document.getElementById('score-guest').onclick = () => { timeSelecionado = 'guest'; alert("Time VISITANTE selecionado para pontos extras"); };
-
+// 3. Formatação de Tempo (MM:SS)
 function formatar(segundos) {
-    let min = Math.floor(Math.abs(segundos) / 60);
-    let seg = Math.abs(segundos) % 60;
+    const min = Math.floor(segundos / 60);
+    const seg = segundos % 60;
     return `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
 }
 
-// AJUSTAR TEMPO MANUALMENTE (+ ou -)
-function adjustTime(segundos) {
-    tempoRestante += segundos;
-    if (tempoRestante < 0) tempoRestante = 0;
-    displayTempo.innerText = formatar(tempoRestante);
-}
-
-// CONTROLE DO TIMER
+// 4. Lógica do Cronômetro (Iniciar/Pausar)
 function toggleTimer() {
     if (rodando) {
         clearInterval(cronometro);
@@ -41,36 +38,52 @@ function toggleTimer() {
                 clearInterval(cronometro);
                 rodando = false;
                 btnStart.innerText = "FIM";
-                alert("FIM DO PERÍODO!");
+                alert("Fim do Período!");
             }
         }, 1000);
     }
 }
 
-// PONTOS E FALTAS
+// 5. Ajuste Manual do Tempo (+/- 1 minuto)
+function adjustTime(segundos) {
+    tempoRestante += segundos;
+    if (tempoRestante < 0) tempoRestante = 0;
+    displayTempo.innerText = formatar(tempoRestante);
+}
+
+// 6. Adicionar Pontos (+1, +2, +3)
 function addPoints(team, points) {
-    const el = document.getElementById(`score-${team}`);
-    let atual = parseInt(el.innerText) || 0;
-    el.innerText = (atual + points).toString().padStart(2, '0');
+    const display = (team === 'home') ? displayHome : displayGuest;
+    let atual = parseInt(display.innerText) || 0;
+    let novoValor = atual + points;
+    if (novoValor < 0) novoValor = 0; // Evita pontos negativos
+    display.innerText = novoValor.toString().padStart(2, '0');
 }
 
-function addCustom() {
-    const val = parseInt(document.getElementById('input-points').value) || 0;
-    addPoints(timeSelecionado, val);
-}
-
+// 7. Controle de Faltas
 function changeFouls(team, val) {
     const el = document.getElementById(`fouls-${team}`);
     let atual = parseInt(el.innerText) || 0;
-    if (atual + val >= 0) el.innerText = atual + val;
+    if (atual + val >= 0) {
+        el.innerText = atual + val;
+    }
 }
 
-// TROCAR PERÍODO
+// 8. Trocar Período (1º ao 4º)
 function changePeriod() {
     periodoAtual++;
-    if (periodoAtual > 4) periodoAtual = 1; // Volta pro 1º ou vai pra prorrogação
-    document.getElementById('display-period').innerText = periodoAtual + "º";
+    if (periodoAtual > 4) {
+        displayPeriod.innerText = "OT"; // Overtime/Prorrogação
+    } else {
+        displayPeriod.innerText = periodoAtual + "º";
+    }
 }
 
+// 9. Eventos dos Botões de Controle
 btnStart.onclick = toggleTimer;
-document.getElementById('reset-timer').onclick = () => location.reload();
+
+document.getElementById('reset-timer').onclick = () => {
+    if(confirm("Deseja resetar todo o placar?")) {
+        location.reload();
+    }
+};
