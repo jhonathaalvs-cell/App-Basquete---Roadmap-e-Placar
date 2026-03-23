@@ -1,4 +1,20 @@
-/* Controle de Telas */
+@charset "UTF-8";
+
+:root {
+    --fonte-main: 'Orbitron', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--fonte-main);
+    overflow-x: hidden;
+}
+
 .screen {
     width: 100%;
     min-height: 100vh;
@@ -6,79 +22,51 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
-/* Estilo da Home */
 .home-content {
+    width: 100%;
+    max-width: 800px;
     text-align: center;
 }
 
+/* Logo adaptável */
 .logo {
-    font-size: 4rem;
-    margin-bottom: 10px;
-    letter-spacing: 5px;
+    font-size: clamp(2rem, 8vw, 4rem);
+    width: 100%;
 }
 
+a {
+    text-decoration: none;
+    width: 100%;
+}
+
+/* Grid de botões */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    margin-top: 40px;
     width: 100%;
-    max-width: 800px;
 }
 
 .menu-btn {
-    height: 150px;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid var(--cor2);
-    border-radius: 20px;
-    color: white;
-    transition: 0.3s;
+    justify-content: center;
+    padding: 20px;
 }
 
-.menu-btn:hover:not(.disabled) {
-    background: var(--cor2);
-    color: var(--cor1);
-    transform: translateY(-5px);
-}
+/* RESPONSIVIDADE PARA CELULAR */
+@media (max-width: 768px) {
+    .menu-grid {
+        /* Força ficar um abaixo do outro */
+        grid-template-columns: 1fr;
+    }
 
-.menu-btn.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    border-color: #555;
-}
-
-.icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-}
-
-.back-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: transparent;
-    border: 1px solid var(--cor2);
-    color: var(--cor2);
-}
-
-body{
-background-color:rgb(175, 121, 50);
-}
-
-a{
-text-decoration: none;
-color: rgb(201, 187, 177);
-}
-.logo{
-color: rgb(73, 7, 5);
-background-color: rgba(245, 245, 245, 0.164);
-padding: 25px 40px;
-border-radius: 15px;
+    .screen {
+        justify-content: flex-start;
+    }
 }

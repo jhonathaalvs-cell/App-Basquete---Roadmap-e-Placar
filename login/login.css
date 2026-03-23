@@ -1,0 +1,41 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+section{
+background-color: black;
+margin-top: 30px;
+padding:  166px 64px;
+margin: 147px;
+
+
+}
+
+
+.logo{
+text-align: center;
+padding: 20px;
+}
+
+
+#login-form{
+display: flex;
+flex-direction: column;
+gap: 9px;
+width: 100%;
+margin: 0 auto;
+max-width: 350px;
+padding: 15px;
+}
+
+
+/* Responsividade para Celular */
+@media (max-width: 768px) {
+    .sociel-grid {
+        grid-template-columns: 1fr; /* Um embaixo do outro no celular */
+    }
+}
