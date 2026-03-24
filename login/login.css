@@ -6,15 +6,38 @@
     box-sizing: border-box;
 }
 
-section{
+body{ 
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 background-color: black;
-margin-top: 30px;
-padding:  166px 64px;
-margin: 147px;
-
-
+background-image: url('../imagens/fundo-login.png');
+background-repeat: no-repeat;
+background-position: center center;
+background-size: cover;
 }
 
+section{
+background-image: linear-gradient(to bottom, #ffa600, #e7ac3df5);
+margin: auto;
+height: 500px;
+padding: 40px 50px;
+width: 90%;
+border-radius: 15px;
+box-shadow: 10px 10px 20px 0px rgba(0, 0, 0, 0.274);
+}
+
+input{
+    height: 30px;
+    text-align: center;
+    background-color: rgb(240, 227, 211);
+    border-radius: 6px;
+    
+
+}
 
 .logo{
 text-align: center;
@@ -30,12 +53,4 @@ width: 100%;
 margin: 0 auto;
 max-width: 350px;
 padding: 15px;
-}
-
-
-/* Responsividade para Celular */
-@media (max-width: 768px) {
-    .sociel-grid {
-        grid-template-columns: 1fr; /* Um embaixo do outro no celular */
-    }
 }
