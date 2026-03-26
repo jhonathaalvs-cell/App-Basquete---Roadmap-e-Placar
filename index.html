@@ -1,47 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUB</title>
-    <link rel="stylesheet" href="inicio.css">
+    <title>Basquete login</title>
+    <link rel="stylesheet" href="estilos/login.css">
 
 </head>
+
 <body>
-    <section id="home-screen" class="screen">
+
+    <section class="screen">
         <div class="home-content">
-            <h1 class="logo">BASQUETE  ONLINE</h1>
-            <p>Selecione uma ferramenta para começar</p>
-            
-            <a href="placar.html">
-                <div class="menu-grid">
-                    <button class="menu-btn" onclick="showScreen('scoreboard-screen')">
-                        <span class="icon">🏀</span>
-                        PLANCAR DIGITAL
-                    </button>
-            </a>
-                
-                <button class="menu-btn disabled">
-                    <span class="icon">📊</span>
-                    ESTATÍSTICAS (EM BREVE)
-                </button>
-                
-                <button class="menu-btn disabled">
-                    <span class="icon">⏱️</span>
-                    TREINAMENTO (EM BREVE)
+            <h1 class="logo">Acesse sua conta</h1>
+            <form id="login-form" class="menu">
+                <input type="email" id="email" placeholder="adicione seu email aqui">
+
+                <input type="password" id="password" placeholder="coloque sua senha">
+
+                <div class="flex-row">
+                    <div id="remember">
+                        <input type="radio">
+                        <label>Remember me </label>
+                    </div>
+                    <span class="span">Esqueceu sua senha?</span>
+                </div>
+                <button class="button-submit">ENTRAR</button>
+                <p class="p">Não possui uma conta? <span class="span"><a href="cadastro.html">Cadastre-se</a></span></p>
+
+            </form>
+        </div>
+
+        <div class="social-login">
+            <p>Ou entre com:</p>
+            <div class="social-grid">
+                <button class="btn-google" onclick="loginGoogle()">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google">
                 </button>
             </div>
         </div>
+
     </section>
 
-    <section id="scoreboard-screen" class="screen" style="display: none;">
-        <button class="back-btn" onclick="showScreen('home-screen')">← VOLTAR</button>
-        
-        <main class="scoreboard-container">
-            </main>
-    </section>
-
-    <script src="script.js"></script>
 
 </body>
+
 </html>
