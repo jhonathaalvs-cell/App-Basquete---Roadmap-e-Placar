@@ -30,15 +30,15 @@ section {
     border-radius: 20px;
 }
 
-h1{
- text-align: center;
+h1 {
+    text-align: center;
     padding: 20px;
 }
 
-.campo{
+.campo {
     display: flex;
     flex-direction: column;
-    align-items:flex-start;
+    align-items: flex-start;
     margin-bottom: 20px;
     width: 100%;
     border-radius: 10px;
@@ -49,28 +49,28 @@ h1{
     transition: 0.2s ease-in-out;
 }
 
-.campo label{
-width: 100%;
-margin-bottom: 2px;
+.campo label {
+    width: 100%;
+    margin-bottom: 2px;
 }
 
-.campo input{
-width: 100%;
- height: 30px;
+.campo input {
+    width: 100%;
+    height: 30px;
     text-align: center;
     background: transparent;
     border: none;
-    border-bottom:2px solid black;
+    border-bottom: 2px solid black;
 }
 
-.campo input:focus{
-outline: none;
-border-bottom: 3px solid #333;
-transition: 0.3s;
+.campo input:focus {
+    outline: none;
+    border-bottom: 3px solid #333;
+    transition: 0.3s;
 }
 
-button{
- margin: 20px 0 10px 0;
+button {
+    margin: 20px 0 10px 0;
     background-color: #838d8d;
     border: none;
     color: white;
@@ -83,19 +83,19 @@ button{
     font-weight: bold;
 }
 
-button:hover{
-   background-color: #e48b16;
+button:hover {
+    background-color: #e48b16;
 }
 
-p{
+p {
     text-align: center;
     color: black;
     font-size: 14px;
     margin: 5px 0;
 }
 
-a{
- font-size: 14px;
+a {
+    font-size: 14px;
     margin-left: 5px;
     color: #0d65e9;
     font-weight: 500;
@@ -103,7 +103,7 @@ a{
     text-decoration: none;
 }
 
-a:hover{
- text-decoration: underline;
+a:hover {
+    text-decoration: underline;
     color: #e48b16;
 }
