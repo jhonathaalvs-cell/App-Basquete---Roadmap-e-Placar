@@ -126,6 +126,11 @@ input:hover {
     background-color: #e48b16;
 }
 
+a{
+text-decoration: none;
+color: white;
+}
+
 .p {
     text-align: center;
     color: black;
