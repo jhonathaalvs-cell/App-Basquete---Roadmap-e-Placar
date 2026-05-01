@@ -15,33 +15,39 @@
     <section class="caixa-registro">
         <h1>Criar conta</h1>
         <form>
-            <div class="campo" id="nome">
-                <label>Nome Completo</label>
-                <input type="text" placeholder="Digite seu nome">
+            <div class="campo" id="campo-nome">
+                <label for="input-nome">Nome Completo</label>
+                <input type="text" id="input-nome" placeholder="Digite seu nome">
             </div>
 
-            <div class="campo" id="email">
-                <label>email</label>
-                <input type="email" placeholder="adicione seu @gmail">
+            <div class="campo" id="campo-email">
+                <label for="input-email">E-mail</label>
+                <input type="email" id="input-email" placeholder="adicione seu @gmail">
             </div>
 
-            <div class="campo" id="senha">
-                <label>Senha</label>
-                <input type="password" placeholder="Crie uma senha">
+            <div class="campo" id="campo-senha">
+                <label for="input-senha">Senha</label>
+                <input type="password" id="input-senha" placeholder="Crie uma senha (mín. 6 caracteres)">
             </div>
 
-            <div class="campo" id="senha">
-                <label>Confirmar Senha</label>
-                <input type="password" placeholder="confirme sua senha">
+            <div class="campo" id="campo-confirmar">
+                <label for="input-confirmar">Confirmar Senha</label>
+                <input type="password" id="input-confirmar" placeholder="confirme sua senha">
             </div>
 
-            <button type="submit">Cadastrar</button>
+            <!-- Mensagem de feedback (erro ou sucesso) -->
+            <div id="msg-feedback"></div>
+
+            <!-- id="btn-cadastrar" para o cadastro.js vincular o evento de clique -->
+            <button type="button" id="btn-cadastrar">Cadastrar</button>
         </form>
 
         <p>Já tem uma conta? <a href="index.html">faça o login</a></p>
 
     </section>
 
+    <!-- type="module" carrega o script como ES Module -->
+    <script type="module" src="scripts/cadastro.js"></script>
 
 </body>
 

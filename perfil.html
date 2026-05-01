@@ -10,35 +10,88 @@
 
 <body>
 
-    <section class="main-container">
-        <div class="image-perfil">
-            <img src="" alt="foto-jogador" class="foto-perfil">
+    <!-- ════════════════════════════════════════════════════
+         MODO VISUALIZAÇÃO — estilo Instagram (padrão)
+         Fica visível enquanto o usuário não clica em "Editar"
+    ════════════════════════════════════════════════════ -->
+    <section id="secao-view" class="perfil-container">
 
-            <label for="upload-foto" class="btn-trocar-foto">📷</label>
-
-            <input type="file" id="display-foto" style="display: none;">
+        <!-- Foto de perfil circular -->
+        <div class="foto-wrapper">
+            <img id="view-foto" src="imagens/icone.png" alt="Foto de perfil" class="foto-perfil">
         </div>
 
-        <div class="info-jogador">
-            <input type="text" class="input-perfil" placeholder="seu apelido">
+        <!-- Nome e e-mail -->
+        <h2 id="view-nome" class="view-nome">Carregando...</h2>
+        <p  id="view-email" class="view-email"></p>
 
-            <textarea class="input-perfil-bio" placeholder="Fale um pouco sobre você"></textarea>
+        <!-- Badge de posição -->
+        <span id="view-posicao" class="badge-posicao">—</span>
+
+        <!-- Bio -->
+        <p id="view-bio" class="view-bio">Nenhuma bio ainda.</p>
+
+        <!-- Ações -->
+        <div class="view-acoes">
+            <button id="btn-editar" class="btn-editar">Editar Perfil</button>
+            <button id="btn-sair"   class="btn-sair">Sair</button>
         </div>
 
-        <div class="seletores-basquete">
-            <label>Sua Posição:</label>
-            <select class="option">
+    </section>
 
-                <option>Armador (PG)</option>
-                <option>Ala-Armador (SG)</option>
-                <option>Ala (SF)</option>
-                <option>Ala-Pivô (PF)</option>
-                <option>Pivô (C)</option>
+    <!-- ════════════════════════════════════════════════════
+         MODO EDIÇÃO — formulário (oculto por padrão)
+         Aparece quando o usuário clica em "Editar Perfil"
+    ════════════════════════════════════════════════════ -->
+    <section id="secao-edit" class="perfil-container oculto">
+
+        <!-- Foto clicável para trocar -->
+        <!-- O clique é no div wrapper (id="foto-edit-wrapper") para capturar
+             tanto o clique na foto quanto no overlay da câmera -->
+        <div class="foto-wrapper editavel" id="foto-edit-wrapper">
+            <img id="edit-foto-btn" src="imagens/icone.png" alt="Trocar foto" class="foto-perfil">
+            <!-- pointer-events: none no overlay evita que ele bloqueie o clique -->
+            <div class="overlay-camera">📷</div>
+        </div>
+        <!-- Input file oculto, acionado pelo clique no wrapper -->
+        <input type="file" id="input-foto" accept="image/*" style="display:none">
+
+        <!-- Apelido -->
+        <div class="campo-edit">
+            <label for="edit-nome">Apelido</label>
+            <input type="text" id="edit-nome" class="input-edit" placeholder="Seu apelido na quadra">
+        </div>
+
+        <!-- Bio -->
+        <div class="campo-edit">
+            <label for="edit-bio">Bio</label>
+            <textarea id="edit-bio" class="input-edit textarea-edit" placeholder="Fale um pouco sobre você..."></textarea>
+        </div>
+
+        <!-- Posição -->
+        <div class="campo-edit">
+            <label for="edit-posicao">Posição</label>
+            <select id="edit-posicao" class="input-edit select-edit">
+                <option value="Armador (PG)">Armador (PG)</option>
+                <option value="Ala-Armador (SG)">Ala-Armador (SG)</option>
+                <option value="Ala (SF)">Ala (SF)</option>
+                <option value="Ala-Pivô (PF)">Ala-Pivô (PF)</option>
+                <option value="Pivô (C)">Pivô (C)</option>
             </select>
         </div>
 
-        <button class="btn-salvar">SALVAR ALTERAÇÕES</button>
+        <!-- Ações -->
+        <div class="edit-acoes">
+            <button id="btn-salvar"   class="btn-salvar">Salvar</button>
+            <button id="btn-cancelar" class="btn-cancelar">Cancelar</button>
+        </div>
+
     </section>
+
+    <!-- Mensagem de feedback FORA das seções para aparecer em ambos os modos -->
+    <div id="msg-feedback" class="msg-feedback"></div>
+
+    <script type="module" src="scripts/perfil.js"></script>
 
 </body>
 

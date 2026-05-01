@@ -17,12 +17,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    /* height: 100vh removido — em celulares com teclado aberto o body
+       ficava pequeno demais e o form saía da tela */
     background-color: black;
     background-image: url('../imagens/fundo-login.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
+    padding: 16px; /* evita que o card encoste nas bordas em telas pequenas */
 }
 
 section {
@@ -31,7 +33,10 @@ section {
     gap: 10px;
     background-color: white;
     padding: 30px;
-    width: 450px;
+    /* width fixo substituído por max-width + width 100%
+       assim o card ocupa a tela toda em celular mas tem limite em desktop */
+    width: 100%;
+    max-width: 450px;
     border-radius: 20px;
 }
 
@@ -177,5 +182,54 @@ a {
     background-color: white;
     cursor: pointer;
     transition: 0.2s ease-in-out;
+}
 
+/* Mensagem de erro exibida quando o login falha */
+#msg-erro {
+    color: #c0392b;
+    font-size: 13px;
+    text-align: center;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVIDADE — celulares até 480px
+════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+        align-items: flex-start;
+        padding-top: 40px;
+    }
+
+    section {
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+
+    .logo {
+        font-size: 22px;
+        padding: 10px;
+    }
+
+    #email,
+    #password {
+        height: 46px;
+    }
+
+    .button-submit {
+        height: 46px;
+        font-size: 14px;
+    }
+
+    .btn-google {
+        height: 46px;
+    }
+
+    /* "Remember me" e "Esqueceu" empilham em telas muito pequenas */
+    .flex-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 }

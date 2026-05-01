@@ -1,110 +1,342 @@
 @charset "UTF-8";
 
+/* ════════════════════════════════════════════════════
+   BASE
+════════════════════════════════════════════════════ */
 * {
-    margin: o;
-    padding: o;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    background-color: rgba(0, 0, 0, 0.164);
-    max-width: 750px;
-    margin: auto;
+    background-color: #0d0d0d;
     min-height: 100vh;
-    position: relative;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-    border-radius: 7px;
-}
-
-.main-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    flex-direction: column; /* empilha section + msg-feedback verticalmente */
+    align-items: center;   /* centraliza horizontalmente na tela */
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-.image-perfil {
-    width: 120px;
-    height: 120px;
+/* Oculta uma seção (alterna entre view e edit) */
+.oculto {
+    display: none !important;
+}
+
+/* ════════════════════════════════════════════════════
+   CONTAINER PRINCIPAL
+════════════════════════════════════════════════════ */
+.perfil-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ════════════════════════════════════════════════════
+   FOTO DE PERFIL
+════════════════════════════════════════════════════ */
+.foto-wrapper {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin-bottom: 8px;
+}
+
+/* Anel laranja ao redor da foto (estilo Instagram Stories) */
+.foto-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
     border-radius: 50%;
-    border: 3px solid #ff8c00;
+    background: linear-gradient(135deg, #ff8c00, #ff4500);
+    z-index: 0;
+}
+
+.foto-perfil {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
     object-fit: cover;
+    border: 3px solid #0d0d0d;
+    position: relative;
+    z-index: 1;
+    display: block;
 }
 
-.input-perfil {
-    width: 100%;
-    background: #1a1a1a1a;
-    border: 1px solid #333;
+.foto-wrapper.editavel {
+    cursor: pointer;
+}
+
+/* Ícone de câmera ao passar o mouse na foto de edição */
+.overlay-camera {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.foto-wrapper.editavel:hover .overlay-camera {
+    opacity: 1;
+}
+
+/* O overlay não intercepta cliques — o clique passa para o wrapper */
+.overlay-camera {
+    pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════
+   MODO VISUALIZAÇÃO
+════════════════════════════════════════════════════ */
+.view-nome {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.view-email {
+    font-size: 13px;
+    color: #888;
+    margin-top: -4px;
+}
+
+/* Badge laranja com a posição do jogador */
+.badge-posicao {
+    background: linear-gradient(90deg, #ff8c00, #ff4500);
     color: white;
-    padding: 12px;
-    margin-top: 12px;
-    border-radius: 5px;
-}
-
-.input-perfil:focus {
-    border-color: #ff8c00;
-    outline: none;
-    box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
-}
-
-.input-perfil-bio {
-    width: 100%;
-    background: #1a1a1a1a;
-    border: 1px solid #333;
-    color: rgb(0, 0, 0);
-    padding: 50px;
-    margin-top: 12px;
-    border-radius: 5px;
-}
-
-label {
-    font-family: 'Orbitron', sans-serif;
     font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    margin: 6px 0;
+    text-transform: uppercase;
+}
+
+.view-bio {
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.6;
+    padding: 4px 0 10px;
+}
+
+/* Botões da view */
+.view-acoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-editar {
+    background: transparent;
+    border: 1.5px solid #555;
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-editar:hover {
+    border-color: #ff8c00;
+    color: #ff8c00;
+}
+
+.btn-sair {
+    background: transparent;
+    border: 1.5px solid #333;
+    color: #888;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-sair:hover {
+    border-color: #c0392b;
+    color: #c0392b;
+}
+
+/* ════════════════════════════════════════════════════
+   MODO EDIÇÃO
+════════════════════════════════════════════════════ */
+.campo-edit {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-edit label {
+    font-size: 11px;
     color: #888;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    display: block;
-    margin-bottom: 8px;
-    padding-top: 10px;
-    justify-content: flex-start;
-    width: 75vh;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    width: auto;
+    padding-top: 0;
+    margin-bottom: 0;
 }
 
-.option {
+.input-edit {
     width: 100%;
-    font-family: 'Orbitron', sans-serif;
-    background: #121212;
+    background: #1a1a1a;
+    border: 1.5px solid #333;
     color: #fff;
-    padding: 15px;
-    border: 1px solid #333;
-    border-radius: 4px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.input-edit:focus {
+    outline: none;
+    border-color: #ff8c00;
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.textarea-edit {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.select-edit {
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
 }
 
-.option:hover {
-    outline: none;
-    border-color: #ff8c00;
-    box-shadow: 0 0 10px #ff8c004d;
-    background-color: #f34201;
-    cursor: pointer;
+.select-edit option {
+    background: #1a1a1a;
 }
 
+/* Botões do modo edição */
+.edit-acoes {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+}
 
 .btn-salvar {
-    width: 100%;
-    padding: 15px;
+    flex: 1;
     background: linear-gradient(90deg, #ff8c00, #ff4500);
     border: none;
     color: white;
-    font-weight: bold;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
-    border-radius: 5px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-top: 100px;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+}
+
+.btn-salvar:hover {
+    opacity: 0.85;
+}
+
+.btn-cancelar {
+    flex: 1;
+    background: transparent;
+    border: 1.5px solid #333;
+    color: #888;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+    border-color: #555;
+    color: #ccc;
+}
+
+/* Mensagem de feedback — fica abaixo das duas seções, sempre visível */
+.msg-feedback {
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-height: 18px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px 16px;
+}
+
+.msg-feedback.sucesso { color: #27ae60; }
+.msg-feedback.erro    { color: #c0392b; }
+.msg-feedback.info    { color: #888;    }
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVIDADE — celulares até 480px
+════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .perfil-container {
+        padding: 24px 16px 32px;
+    }
+
+    /* Foto menor em mobile — wrapper E pseudo-element precisam bater */
+    .foto-wrapper {
+        width: 90px;
+        height: 90px;
+    }
+
+    .foto-perfil {
+        width: 90px;
+        height: 90px;
+    }
+
+    .view-nome {
+        font-size: 18px;
+    }
+
+    .view-bio {
+        font-size: 13px;
+    }
+
+    /* Botões de ação ficam lado a lado e ocupam toda a largura */
+    .view-acoes {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-editar,
+    .btn-sair {
+        flex: 1;
+        text-align: center;
+        padding: 10px 12px;
+    }
+
+    /* font-size 16px evita zoom automático no iOS ao focar o input */
+    .input-edit {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .btn-salvar,
+    .btn-cancelar {
+        padding: 14px;
+        font-size: 15px;
+    }
 }

@@ -20,18 +20,25 @@
                 <input type="password" id="password" placeholder="coloque sua senha">
 
                 <div class="flex-row">
-                    <div id="remember">
-                        <input type="radio">
-                        <label>Remember me </label>
+                    <div id="remember-box">
+                        <!-- Checkbox para lembrar o email do usuário -->
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Lembrar-me</label>
                     </div>
-                    <span class="span">Esqueceu sua senha?</span>
+                    <!-- id="btn-esqueceu" para o login.js encontrar esse elemento -->
+                    <span class="span" id="btn-esqueceu">Esqueceu sua senha?</span>
                 </div>
-                <button type="button" class="button-submit" onclick="window.location.href='hub.html'">
+
+                <!-- Mensagem de erro exibida quando login falha -->
+                <div id="msg-erro"></div>
+
+                <!-- id="btn-entrar" para o login.js vincular o evento de clique -->
+                <button type="button" class="button-submit" id="btn-entrar">
                     ENTRAR
                 </button>
                 <p class="p">Não possui uma conta?
-                    <a href="cadastro.html"><span class="span">Cadastre-se</span>
-                </p></a>
+                    <a href="cadastro.html"><span class="span">Cadastre-se</span></a>
+                </p>
 
             </form>
         </div>
@@ -39,7 +46,8 @@
         <div class="social-login">
             <p>Ou entre com:</p>
             <div class="social-grid">
-                <button class="btn-google" onclick="loginGoogle()">
+                <!-- id="btn-google" para o login.js vincular o evento de clique -->
+                <button class="btn-google" id="btn-google">
                     <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google">
                 </button>
             </div>
@@ -47,6 +55,10 @@
 
     </section>
 
+
+<!-- type="module" carrega o script como ES Module (suporta import/export)
+     e é adiado automaticamente — só roda depois que o HTML estiver pronto -->
+<script type="module" src="scripts/login.js"></script>
 
 </body>
 

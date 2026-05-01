@@ -12,12 +12,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: black;
     background-image: url('../imagens/fundo-login.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
+    padding: 16px;
 }
 
 section {
@@ -26,7 +26,8 @@ section {
     gap: 10px;
     background-color: white;
     padding: 30px;
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
     border-radius: 20px;
 }
 
@@ -106,4 +107,50 @@ a {
 a:hover {
     text-decoration: underline;
     color: #e48b16;
+}
+
+/* Mensagem de feedback do formulário de cadastro */
+#msg-feedback {
+    font-size: 13px;
+    text-align: center;
+    min-height: 18px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVIDADE — celulares até 480px
+════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+        align-items: flex-start;
+        padding-top: 30px;
+    }
+
+    section {
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+
+    h1 {
+        font-size: 20px;
+        padding: 10px;
+    }
+
+    .campo {
+        height: auto;        /* altura fixa quebrava o layout em mobile */
+        padding-left: 0;
+        margin-bottom: 14px;
+    }
+
+    .campo input {
+        font-size: 16px;     /* evita zoom automático no iOS ao focar */
+    }
+
+    button {
+        height: 46px;
+        font-size: 14px;
+        margin: 14px 0 8px;
+    }
 }

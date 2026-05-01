@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga</title>
+    <link rel="shortcut icon" href="imagens/favicon.png" type="image/png">
+    <link rel="stylesheet" href="estilos/liga.css">
+</head>
+
+<body>
+
+    <!-- ════════════════════════════════════
+         HEADER — igual ao hub
+    ════════════════════════════════════ -->
+    <header class="main-header">
+        <div class="logo-area">
+            <img src="imagens/icone.png" alt="icone" class="logo-app">
+        </div>
+    </header>
+
+    <nav class="nav-bar">
+        <a href="hub.html" class="link">hub</a>
+        <a href="liga.html" class="link ativo">liga</a>
+        <a href="" class="link">jogadores</a>
+        <a href="perfil.html" class="link">perfil</a>
+    </nav>
+
+    <!-- ════════════════════════════════════
+         TELA DE CARREGAMENTO
+         Fica visível enquanto o Firebase ainda
+         está verificando se o usuário está logado
+    ════════════════════════════════════ -->
+    <div id="tela-loading" class="tela-loading">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <!-- ════════════════════════════════════
+         PAINEL DO ADMIN
+         Visível apenas para usuários com role = "admin"
+         O JS adiciona/remove a classe .oculto conforme o role
+    ════════════════════════════════════ -->
+    <section id="painel-admin" class="painel oculto">
+
+        <div class="painel-cabecalho">
+            <h2 class="painel-titulo">⚙️ Painel do Admin</h2>
+            <p class="painel-subtitulo">Você tem controle total sobre as ligas.</p>
+        </div>
+
+        <!-- Botão principal: abre o formulário de criação de liga -->
+        <button id="btn-abrir-form" class="btn-primario">+ Criar Nova Liga</button>
+
+        <!-- ─────────────────────────────────
+             FORMULÁRIO DE CRIAÇÃO DE LIGA
+             Oculto por padrão; aparece ao clicar no botão acima
+        ───────────────────────────────── -->
+        <div id="form-nova-liga" class="card-form oculto">
+            <h3 class="form-titulo">Nova Liga</h3>
+
+            <label class="form-label" for="input-nome-liga">Nome da Liga</label>
+            <input id="input-nome-liga" class="form-input" type="text"
+                   placeholder="Ex: Liga de Verão 2026" maxlength="50">
+
+            <label class="form-label" for="input-descricao">Descrição</label>
+            <textarea id="input-descricao" class="form-input form-textarea"
+                      placeholder="Descreva as regras, premiação, local..." maxlength="300"></textarea>
+
+            <label class="form-label" for="input-data-inicio">Data de Início (inscrições)</label>
+            <input id="input-data-inicio" class="form-input" type="date">
+
+            <label class="form-label" for="input-max-times">Máximo de Times</label>
+            <input id="input-max-times" class="form-input" type="number"
+                   min="2" max="16" placeholder="Ex: 4">
+
+            <label class="form-label" for="input-jogadores-time">Jogadores por Time</label>
+            <input id="input-jogadores-time" class="form-input" type="number"
+                   min="1" max="12" placeholder="Ex: 5">
+
+            <div class="form-acoes">
+                <button id="btn-salvar-liga" class="btn-primario">Salvar Liga</button>
+                <button id="btn-cancelar-form" class="btn-secundario">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- ─────────────────────────────────
+             LISTA DE LIGAS EXISTENTES (Admin)
+             Aqui o admin vê e gerencia todas as ligas
+        ───────────────────────────────── -->
+        <div class="secao-ligas">
+            <h3 class="secao-titulo">Ligas Cadastradas</h3>
+
+            <!-- O JS injeta os cards das ligas aqui -->
+            <div id="lista-ligas-admin" class="lista-ligas">
+                <!-- Estado vazio — aparece enquanto não há ligas cadastradas -->
+                <p id="sem-ligas-admin" class="msg-vazia">Nenhuma liga cadastrada ainda.</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════
+         PAINEL DO JOGADOR
+         Visível para usuários comuns (role = "jogador")
+    ════════════════════════════════════ -->
+    <section id="painel-jogador" class="painel oculto">
+
+        <div class="painel-cabecalho">
+            <h2 class="painel-titulo">🏀 Ligas</h2>
+            <p class="painel-subtitulo">Confira as ligas abertas para inscrição.</p>
+        </div>
+
+        <!-- Lista de ligas visíveis para o jogador -->
+        <div id="lista-ligas-jogador" class="lista-ligas">
+            <!-- O JS injeta os cards aqui -->
+            <p id="sem-ligas-jogador" class="msg-vazia">Nenhuma liga ativa no momento.<br>Aguarde o Admin abrir o período de inscrições.</p>
+        </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════
+         MENSAGEM DE FEEDBACK (salvo, erro, etc.)
+         Fica fora dos painéis para ser sempre visível
+    ════════════════════════════════════ -->
+    <div id="msg-feedback" class="msg-feedback oculto"></div>
+
+    <!-- ════════════════════════════════════
+         MODAL DE INSCRIÇÃO
+         Abre quando o jogador clica em "Ver Liga"
+         O JS popula o checklist e habilita o botão
+         conforme o perfil do usuário
+    ════════════════════════════════════ -->
+    <div id="modal-inscricao" class="modal-overlay oculto">
+        <div class="modal-caixa">
+
+            <!-- Cabeçalho do modal: nome da liga + botão fechar -->
+            <div class="modal-header">
+                <h3 id="modal-liga-nome" class="modal-titulo"></h3>
+                <button id="btn-fechar-modal" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Título da seção checklist -->
+                <p class="checklist-titulo">Checklist de inscrição</p>
+                <p class="checklist-subtitulo">Todos os itens precisam estar ✅ para se inscrever.</p>
+
+                <!-- Os itens do checklist são injetados pelo JS aqui -->
+                <ul id="checklist-container" class="checklist-container"></ul>
+
+                <!-- Estado: já inscrito — aparece em vez do botão se o usuário já se inscreveu -->
+                <div id="estado-inscrito" class="estado-inscrito oculto">
+                    <span class="inscrito-badge">✅ Você já está inscrito nesta liga!</span>
+                    <p class="inscrito-info">Aguarde o Admin fechar as inscrições e montar os times.</p>
+                </div>
+
+                <!-- Botão principal de inscrição — habilitado só se todos os checks passam -->
+                <button id="btn-confirmar-inscricao" class="btn-primario oculto">
+                    Confirmar Inscrição 🏀
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/liga.js" type="module"></script>
+
+    <!-- ════════════════════════════════════
+         MODAL EDITAR JOGO (só admin)
+         Permite reagendar data, hora, local e status de qualquer jogo
+    ════════════════════════════════════ -->
+    <div id="modal-editar-jogo" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-pequena">
+
+            <div class="modal-header">
+                <h3 class="modal-titulo">⚙️ Editar Jogo</h3>
+                <button id="btn-fechar-editar-jogo" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Times envolvidos (só leitura) -->
+                <div id="editar-jogo-confronto" class="placar-confronto" style="margin-bottom:16px"></div>
+
+                <label class="form-label" for="editar-jogo-data">Data do Jogo</label>
+                <input id="editar-jogo-data" class="form-input" type="date">
+
+                <label class="form-label" for="editar-jogo-hora">Horário</label>
+                <input id="editar-jogo-hora" class="form-input" type="time">
+
+                <label class="form-label" for="editar-jogo-local">Local / Quadra</label>
+                <input id="editar-jogo-local" class="form-input" type="text"
+                       placeholder="Ex: Quadra do Ginásio Central" maxlength="80">
+
+                <label class="form-label" for="editar-jogo-obs">Observações</label>
+                <textarea id="editar-jogo-obs" class="form-input form-textarea"
+                          placeholder="Ex: Jogo adiado, jogador ausente..." maxlength="200" rows="3"></textarea>
+
+                <!-- Status manual (cancelar, reagendar, etc.) -->
+                <label class="form-label" for="editar-jogo-status">Status</label>
+                <select id="editar-jogo-status" class="form-input form-select">
+                    <option value="pendente">⏳ Pendente</option>
+                    <option value="finalizado">✅ Finalizado</option>
+                    <option value="cancelado">❌ Cancelado</option>
+                    <option value="adiado">📅 Adiado</option>
+                </select>
+
+                <div class="form-acoes" style="margin-top:20px">
+                    <button id="btn-salvar-editar-jogo" class="btn-primario">Salvar Alterações</button>
+                    <button id="btn-cancelar-editar-jogo" class="btn-secundario">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL NOVO CONFRONTO (só admin)
+         Cria um novo jogo manualmente em qualquer rodada
+    ════════════════════════════════════ -->
+    <div id="modal-novo-jogo" class="modal-overlay oculto">
+        <div class="modal-caixa">
+
+            <div class="modal-header">
+                <h3 class="modal-titulo">➕ Novo Confronto</h3>
+                <button id="btn-fechar-novo-jogo" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <label class="form-label" for="novo-jogo-rodada">Rodada</label>
+                <input id="novo-jogo-rodada" class="form-input" type="number" min="1" max="99" placeholder="Ex: 1">
+
+                <label class="form-label" for="novo-jogo-time-a">Time A (mandante)</label>
+                <select id="novo-jogo-time-a" class="form-input form-select">
+                    <option value="">Selecione o Time A...</option>
+                </select>
+
+                <label class="form-label" for="novo-jogo-time-b">Time B (visitante)</label>
+                <select id="novo-jogo-time-b" class="form-input form-select">
+                    <option value="">Selecione o Time B...</option>
+                </select>
+
+                <label class="form-label" for="novo-jogo-data">Data do Jogo</label>
+                <input id="novo-jogo-data" class="form-input" type="date">
+
+                <label class="form-label" for="novo-jogo-hora">Horário</label>
+                <input id="novo-jogo-hora" class="form-input" type="time">
+
+                <label class="form-label" for="novo-jogo-local">Local / Quadra</label>
+                <input id="novo-jogo-local" class="form-input" type="text"
+                       placeholder="Ex: Quadra do Ginásio Central" maxlength="80">
+
+                <label class="form-label" for="novo-jogo-obs">Observações</label>
+                <textarea id="novo-jogo-obs" class="form-input form-textarea"
+                          placeholder="Observações opcionais..." maxlength="200" rows="2"></textarea>
+
+                <div class="form-acoes" style="margin-top:20px">
+                    <button id="btn-salvar-novo-jogo" class="btn-primario">Criar Confronto ✅</button>
+                    <button id="btn-cancelar-novo-jogo" class="btn-secundario">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL EDITAR LIGA (só admin)
+         Abre ao clicar "✏️ Editar" num card de liga
+         Permite alterar nome, descrição, data e limites
+    ════════════════════════════════════ -->
+    <div id="modal-editar-liga" class="modal-overlay oculto">
+        <div class="modal-caixa">
+
+            <div class="modal-header">
+                <h3 class="modal-titulo">✏️ Editar Liga</h3>
+                <button id="btn-fechar-editar" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <label class="form-label" for="edit-nome-liga">Nome da Liga</label>
+                <input id="edit-nome-liga" class="form-input" type="text" maxlength="50">
+
+                <label class="form-label" for="edit-descricao">Descrição</label>
+                <textarea id="edit-descricao" class="form-input form-textarea" maxlength="300"></textarea>
+
+                <label class="form-label" for="edit-data-inicio">Data de Início</label>
+                <input id="edit-data-inicio" class="form-input" type="date">
+
+                <label class="form-label" for="edit-max-times">Máximo de Times</label>
+                <input id="edit-max-times" class="form-input" type="number" min="2" max="16">
+
+                <label class="form-label" for="edit-jogadores-time">Jogadores por Time</label>
+                <input id="edit-jogadores-time" class="form-input" type="number" min="1" max="12">
+
+                <div class="form-acoes">
+                    <button id="btn-salvar-edicao" class="btn-primario">Salvar Alterações</button>
+                    <button id="btn-cancelar-edicao" class="btn-secundario">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL CALENDÁRIO — Jogos e Classificação
+         Abre ao clicar "📅 Calendário" em ligas com status "ativo"
+    ════════════════════════════════════ -->
+    <div id="modal-calendario" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-larga">
+
+            <div class="modal-header">
+                <h3 id="cal-liga-nome" class="modal-titulo"></h3>
+                <button id="btn-fechar-cal" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Abas: Jogos / Classificação / Times (admin) -->
+                <div class="cal-tabs" role="tablist">
+                    <button class="cal-tab ativo" data-tab="jogos" role="tab">🗓 Jogos</button>
+                    <button class="cal-tab" data-tab="classificacao" role="tab">🏆 Classificação</button>
+                    <button class="cal-tab cal-tab-admin oculto" data-tab="times" role="tab">⚙️ Times</button>
+                </div>
+
+                <!-- Aba Jogos: accordion por rodada -->
+                <div id="cal-jogos" class="cal-secao">
+                    <p class="draft-carregando">Carregando jogos...</p>
+                </div>
+
+                <!-- Aba Classificação: tabela de pontos -->
+                <div id="cal-classificacao" class="cal-secao oculto">
+                    <p class="draft-carregando">Calculando classificação...</p>
+                </div>
+
+                <!-- Aba Times: editar nomes e jogadores (só admin) -->
+                <div id="cal-times" class="cal-secao oculto">
+                    <p class="draft-carregando">Carregando times...</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL REGISTRAR PLACAR (só admin)
+         Mini-modal que abre ao clicar num jogo pendente
+    ════════════════════════════════════ -->
+    <div id="modal-placar" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-pequena">
+
+            <div class="modal-header">
+                <h3 class="modal-titulo">Registrar Resultado</h3>
+                <button id="btn-fechar-placar" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+                <!-- Confronto: "Time A  ×  Time B" com as cores -->
+                <div id="placar-confronto" class="placar-confronto"></div>
+
+                <div class="placar-inputs">
+                    <div class="placar-campo">
+                        <label id="label-placar-a" class="placar-label"></label>
+                        <input id="input-placar-a" class="form-input form-input-pequeno placar-numero"
+                               type="number" min="0" max="999" placeholder="0">
+                    </div>
+                    <span class="placar-vs">×</span>
+                    <div class="placar-campo">
+                        <label id="label-placar-b" class="placar-label"></label>
+                        <input id="input-placar-b" class="form-input form-input-pequeno placar-numero"
+                               type="number" min="0" max="999" placeholder="0">
+                    </div>
+                </div>
+
+                <button id="btn-salvar-placar" class="btn-primario">Salvar Resultado ✅</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL DE DRAFT (só admin)
+         Abre quando admin clica em "Montar Times" numa liga com status "draft"
+    ════════════════════════════════════ -->
+    <div id="modal-draft" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-larga">
+
+            <div class="modal-header">
+                <h3 id="draft-liga-nome" class="modal-titulo"></h3>
+                <button id="btn-fechar-draft" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- ── Área superior: inscritos disponíveis ── -->
+                <div class="draft-secao">
+                    <p class="draft-label">Jogadores inscritos</p>
+                    <p class="draft-sublabel">Clique num jogador para adicioná-lo ao time selecionado.</p>
+                    <!-- JS injeta os chips de jogadores aqui -->
+                    <div id="draft-jogadores" class="draft-jogadores-container"></div>
+                </div>
+
+                <!-- ── Controles de configuração dos times ── -->
+                <div class="draft-secao draft-controles">
+                    <div class="draft-campo">
+                        <label class="form-label" for="draft-qtd-times">Número de times</label>
+                        <input id="draft-qtd-times" class="form-input form-input-pequeno"
+                               type="number" min="2" max="16" placeholder="Ex: 4">
+                    </div>
+                    <button id="btn-gerar-times" class="btn-secundario">Gerar times vazios</button>
+                    <button id="btn-auto-draft" class="btn-auto-draft">⚡ Draft Automático</button>
+                </div>
+
+                <!-- ── Cards dos times (preenchidos manual ou automaticamente) ── -->
+                <!-- JS injeta os cards aqui -->
+                <div id="draft-times" class="draft-times-grid"></div>
+
+                <!-- ── Botão salvar — só aparece quando há times criados ── -->
+                <button id="btn-salvar-draft" class="btn-primario oculto">
+                    Salvar Times e Avançar para Jogos 🏆
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
