@@ -425,6 +425,144 @@
         </div>
     </div>
 
+    <!-- ════════════════════════════════════
+         VIEW CALENDÁRIO DO JOGADOR
+         Seção de tela cheia — substitui o painel do jogador
+         quando o usuário clica em "📅 Ver Calendário".
+         Tem design mais moderno e responsivo que o modal do admin.
+    ════════════════════════════════════ -->
+    <section id="view-jogador-calendario" class="vjc-wrapper oculto">
+
+        <!-- Topo: botão voltar + nome da liga -->
+        <div class="vjc-topo">
+            <button id="vjc-btn-voltar" class="vjc-btn-voltar">← Voltar</button>
+            <div class="vjc-topo-info">
+                <h2 id="vjc-liga-nome" class="vjc-liga-nome">Liga</h2>
+                <span class="vjc-badge-ativo">🟢 Ativo</span>
+            </div>
+        </div>
+
+        <!-- Abas -->
+        <div class="vjc-tabs" role="tablist">
+            <button class="vjc-tab ativo" data-vjc-tab="jogos" role="tab">🗓 Jogos</button>
+            <button class="vjc-tab" data-vjc-tab="times" role="tab">🏀 Times</button>
+            <button class="vjc-tab" data-vjc-tab="classificacao" role="tab">📊 Classificação</button>
+            <button class="vjc-tab vjc-tab-playoffs oculto" data-vjc-tab="playoffs" role="tab">⚡ Playoffs</button>
+        </div>
+
+        <!-- Aba: Jogos (carregado pelo JS) -->
+        <div id="vjc-jogos" class="vjc-secao">
+            <p class="vjc-carregando">Carregando jogos...</p>
+        </div>
+
+        <!-- Aba: Times (carregado pelo JS) -->
+        <div id="vjc-times" class="vjc-secao oculto">
+            <p class="vjc-carregando">Carregando times...</p>
+        </div>
+
+        <!-- Aba: Classificação (carregado pelo JS) -->
+        <div id="vjc-classificacao" class="vjc-secao oculto">
+            <p class="vjc-carregando">Calculando classificação...</p>
+        </div>
+
+        <!-- Aba: Playoffs (carregado pelo JS, só aparece quando liga está em playoffs) -->
+        <div id="vjc-playoffs" class="vjc-secao oculto">
+            <p class="vjc-carregando">Carregando playoffs...</p>
+        </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════
+         MODAL: INICIAR PLAYOFFS (admin)
+         Admin escolhe quantos times avançam;
+         o sistema gera o chaveamento automaticamente
+         pela ordem da classificação.
+    ════════════════════════════════════ -->
+    <div id="modal-iniciar-playoffs" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-pequena">
+
+            <div class="modal-header">
+                <h3 class="modal-titulo">⚡ Iniciar Playoffs</h3>
+                <button id="btn-fechar-iniciar-playoffs" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+                <p style="font-size:13px;color:#888;margin-bottom:20px">
+                    Os times serão selecionados automaticamente pela classificação atual da fase de grupos.
+                </p>
+
+                <label class="form-label" for="po-num-times">Quantos times avançam?</label>
+                <select id="po-num-times" class="form-input form-select">
+                    <option value="2">2 times — Final direta</option>
+                    <option value="4" selected>4 times — Semifinais + Final</option>
+                    <option value="8">8 times — Quartas de Final + Semis + Final</option>
+                </select>
+
+                <div class="form-acoes" style="margin-top:20px">
+                    <button id="btn-confirmar-playoffs" class="btn-primario">Gerar Chaveamento ⚡</button>
+                    <button id="btn-cancelar-iniciar-playoffs" class="btn-secundario">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL: BRACKET DE PLAYOFFS (admin)
+         Exibe o chaveamento completo com
+         todos os confrontos e resultados.
+    ════════════════════════════════════ -->
+    <div id="modal-playoffs" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-larga">
+
+            <div class="modal-header">
+                <h3 id="po-liga-nome" class="modal-titulo">⚡ Playoffs</h3>
+                <button id="btn-fechar-playoffs" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <!-- O JS injeta o bracket completo aqui -->
+            <div class="modal-corpo" id="po-corpo">
+                <p class="draft-carregando">Carregando...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         MODAL: REGISTRAR JOGO DE PLAYOFF (admin)
+         Mini-modal para registrar o placar de
+         um jogo individual de uma série melhor de 3.
+    ════════════════════════════════════ -->
+    <div id="modal-jogo-playoff" class="modal-overlay oculto">
+        <div class="modal-caixa modal-caixa-pequena">
+
+            <div class="modal-header">
+                <h3 id="po-jogo-titulo" class="modal-titulo">Registrar Jogo</h3>
+                <button id="btn-fechar-jogo-playoff" class="btn-fechar-modal" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+                <div id="po-jogo-confronto" class="placar-confronto" style="margin-bottom:16px"></div>
+
+                <div class="placar-inputs">
+                    <div class="placar-campo">
+                        <label id="po-jogo-label-a" class="placar-label"></label>
+                        <input id="po-jogo-placar-a" class="form-input form-input-pequeno placar-numero"
+                               type="number" min="0" max="999" placeholder="0">
+                    </div>
+                    <span class="placar-vs">×</span>
+                    <div class="placar-campo">
+                        <label id="po-jogo-label-b" class="placar-label"></label>
+                        <input id="po-jogo-placar-b" class="form-input form-input-pequeno placar-numero"
+                               type="number" min="0" max="999" placeholder="0">
+                    </div>
+                </div>
+
+                <button id="btn-salvar-jogo-playoff" class="btn-primario" style="margin-top:16px">
+                    Salvar Resultado ✅
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

@@ -1,0 +1,557 @@
+   VIEW CALENDÁRIO DO JOGADOR — design moderno, tela cheia
+   ══════════════════════════════════════════════════════════════ */
+
+.vjc-wrapper {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    animation: vjc-entrada 0.3s ease;
+}
+
+@keyframes vjc-entrada {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Topo ─── */
+.vjc-topo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.vjc-btn-voltar {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 8px 14px;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.vjc-btn-voltar:hover {
+    background: rgba(255,255,255,0.13);
+    color: #fff;
+}
+
+.vjc-topo-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.vjc-liga-nome {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.vjc-badge-ativo {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2ecc71;
+    background: rgba(46,204,113,0.1);
+    border: 1px solid rgba(46,204,113,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    letter-spacing: 0.4px;
+}
+
+/* ─── Abas ─── */
+.vjc-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #222;
+}
+
+.vjc-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+}
+
+.vjc-tab.ativo {
+    color: #ff8c00;
+    border-bottom-color: #ff8c00;
+}
+
+.vjc-tab:hover:not(.ativo) {
+    color: #ccc;
+}
+
+/* ─── Seções ─── */
+.vjc-secao {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.vjc-carregando,
+.vjc-vazio {
+    color: #555;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 0;
+}
+
+/* ─── Rodada ─── */
+.vjc-rodada {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.vjc-rodada-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ff8c00;
+    padding: 0 4px;
+}
+
+.vjc-rodada-jogos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ─── Card de Jogo ─── */
+.vjc-card {
+    background: #161616;
+    border: 1px solid #252525;
+    border-radius: 14px;
+    padding: 18px 20px 14px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.15s;
+}
+
+.vjc-card:hover {
+    border-color: #383838;
+    transform: translateY(-1px);
+}
+
+.vjc-card-cancelado {
+    opacity: 0.5;
+}
+
+.vjc-card-status {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 3px 10px;
+}
+
+.status-finalizado {
+    color: #2ecc71;
+    background: rgba(46,204,113,0.1);
+    border: 1px solid rgba(46,204,113,0.2);
+}
+
+.status-pendente {
+    color: #f39c12;
+    background: rgba(243,156,18,0.1);
+    border: 1px solid rgba(243,156,18,0.2);
+}
+
+.status-cancelado {
+    color: #e74c3c;
+    background: rgba(231,76,60,0.1);
+    border: 1px solid rgba(231,76,60,0.2);
+}
+
+.status-adiado {
+    color: #9b59b6;
+    background: rgba(155,89,182,0.1);
+    border: 1px solid rgba(155,89,182,0.2);
+}
+
+/* ─── Confronto ─── */
+.vjc-card-confronto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    margin-top: 30px;
+}
+
+.vjc-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.vjc-time-direita {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+.vjc-time-nome {
+    font-size: 15px;
+    font-weight: 600;
+    color: #bbb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s;
+}
+
+.vjc-vencedor .vjc-time-nome {
+    color: #fff;
+}
+
+.vjc-time-barra {
+    width: 4px;
+    height: 36px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* ─── Placar ─── */
+.vjc-placar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.vjc-placar-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #444;
+    min-width: 36px;
+    text-align: center;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.vjc-vencedor-num {
+    color: #ff8c00;
+}
+
+.vjc-placar-sep {
+    font-size: 18px;
+    color: #333;
+    font-weight: 300;
+}
+
+/* ─── Meta info ─── */
+.vjc-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+}
+
+.vjc-sep {
+    color: #333;
+}
+
+.vjc-card-obs {
+    font-size: 12px;
+    color: #666;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid #333;
+    padding: 5px 10px;
+    border-radius: 0 4px 4px 0;
+    margin-top: 8px;
+}
+
+/* ═══════════════════════════════════
+   CLASSIFICAÇÃO — Cards de time
+   ═══════════════════════════════════ */
+
+.vjc-class-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vjc-class-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #161616;
+    border: 1px solid #252525;
+    border-radius: 12px;
+    padding: 14px 18px;
+    transition: border-color 0.2s;
+}
+
+.vjc-class-card:hover {
+    border-color: #383838;
+}
+
+/* ─── 1º lugar: Ouro ─── */
+.vjc-class-ouro {
+    border-color: #b8860b;
+    background: linear-gradient(135deg, #2a2200 0%, #1a1600 100%);
+    box-shadow: inset 3px 0 0 #ffc107;
+}
+
+.vjc-class-ouro .vjc-class-pos  { color: #ffc107; }
+.vjc-class-ouro .vjc-class-pts  { color: #ffc107; }
+.vjc-class-ouro .vjc-class-nome { color: #ffe082; }
+
+/* ─── 2º lugar: Prata ─── */
+.vjc-class-prata {
+    border-color: #78909c;
+    background: linear-gradient(135deg, #2b3d47 0%, #12181b 100%);
+    box-shadow: inset 3px 0 0 #b0bec5;
+}
+
+.vjc-class-prata .vjc-class-pos { color: #b0bec5; }
+.vjc-class-prata .vjc-class-pts { color: #b0bec5; }
+.vjc-class-prata .vjc-class-nome { color: #cfd8dc; }
+
+/* ─── 3º lugar: Bronze ─── */
+.vjc-class-bronze {
+    border-color: #8d5524;
+    background: linear-gradient(135deg, #221608 0%, #160e04 100%);
+    box-shadow: inset 3px 0 0 #cd7f32;
+}
+
+.vjc-class-bronze .vjc-class-pos { color: #cd7f32; }
+.vjc-class-bronze .vjc-class-pts { color: #cd7f32; }
+.vjc-class-bronze .vjc-class-nome { color: #e0a96d; }
+
+/* ─── Últimos 3: zona de rebaixamento ─── */
+.vjc-class-zona-rebaixamento {
+    border-color: rgba(231, 76, 60, 0.35);
+    background: linear-gradient(135deg, #1e0a09 0%, #140605 100%);
+    box-shadow: inset 3px 0 0 #e74c3c;
+}
+
+.vjc-class-zona-rebaixamento .vjc-class-pos { color: #e74c3c; }
+.vjc-class-zona-rebaixamento .vjc-class-pts { color: #e74c3c; }
+
+/* ─── Fallback (sem destaque especial) ─── */
+.vjc-class-lider {
+    border-color: rgba(255,140,0,0.35);
+    background: rgba(255,140,0,0.05);
+}
+
+.vjc-class-pos {
+    font-size: 18px;
+    font-weight: 800;
+    color: #444;
+    min-width: 32px;
+    text-align: center;
+}
+
+.vjc-class-lider .vjc-class-pos {
+    color: #ff8c00;
+}
+
+.vjc-class-cor {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.vjc-class-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.vjc-class-nome {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ddd;
+    display: block;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vjc-class-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #555;
+}
+
+.vjc-class-stats strong {
+    color: #aaa;
+}
+
+.vjc-stat-v strong { color: #2ecc71; }
+.vjc-stat-d strong { color: #e74c3c; }
+
+.vjc-class-pts {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ff8c00;
+    min-width: 48px;
+    text-align: center;
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vjc-class-pts small {
+    font-size: 10px;
+    font-weight: 400;
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+.vjc-class-legenda {
+    font-size: 11px;
+    color: #444;
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ABA TIMES — Cards de time com jogadores
+   ══════════════════════════════════════════════════════════════ */
+
+.vjc-times-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Card do time */
+.vjc-time-card {
+    background: #161616;
+    border: 1px solid #252525;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+}
+
+.vjc-time-card:hover {
+    border-color: #333;
+    transform: translateY(-1px);
+}
+
+/* Header: barra colorida à esquerda + nome + badge de posição */
+.vjc-time-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 14px 18px 12px 16px;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.vjc-time-card-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.vjc-time-card-nome {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f0f0f0;
+}
+
+/* Badge de posição na classificação */
+.vjc-time-pos-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.vjc-time-pos-ouro {
+    background: rgba(255, 193, 7, 0.12);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.vjc-time-pos-prata {
+    background: rgba(176, 190, 197, 0.1);
+    color: #b0bec5;
+    border: 1px solid rgba(176, 190, 197, 0.25);
+}
+
+.vjc-time-pos-bronze {
+    background: rgba(205, 127, 50, 0.12);
+    color: #cd7f32;
+    border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+.vjc-time-pos-zona {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.25);
+}
+
+.vjc-time-pos-normal {
+    background: rgba(255, 255, 255, 0.05);
+    color: #888;
+    border: 1px solid #333;
+}
+
+/* Lista de jogadores dentro do card */
+.vjc-time-card-jogadores {
+    padding: 12px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vjc-time-jogador {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.vjc-time-jogador-nome {
+    font-size: 14px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.vjc-time-jogador-pos {
+    font-size: 11px;
+    color: #888;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+
+.vjc-time-sem-jogadores {
+    font-size: 13px;
+    color: #555;
+    font-style: italic;
+}

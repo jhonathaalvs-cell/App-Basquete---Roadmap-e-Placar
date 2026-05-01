@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { auth, db } from "./firebase-config.js";
+import { initPlayoffs, calcularClassificacaoLista } from "./liga/playoffs.js";
 
 import {
     onAuthStateChanged,
@@ -18,9 +19,11 @@ import {
     getDoc,
     setDoc,
     updateDoc,
+    deleteDoc,
     collection,
     addDoc,
     getDocs,
+    writeBatch,
     query,
     orderBy,
     serverTimestamp
@@ -194,7 +197,7 @@ async function carregarLigasJogador() {
 
         const ligasVisiveis = snap.docs.filter(d => {
             const s = d.data().status;
-            return s === "inscricoes" || s === "ativo";
+            return s === "inscricoes" || s === "ativo" || s === "playoffs" || s === "encerrado";
         });
 
         if (ligasVisiveis.length === 0) {
@@ -245,6 +248,7 @@ function criarCardLiga(liga, id, ehAdmin) {
         inscricoes: "🟢 Inscrições abertas",
         draft:      "🟡 Montando times",
         ativo:      "🔴 Em andamento",
+        playoffs:   "⚡ Playoffs",
         encerrado:  "⚫ Encerrado"
     };
 
@@ -274,6 +278,7 @@ function criarCardLiga(liga, id, ehAdmin) {
             <span id="contador-${id}" class="badge-contador">👥 carregando...</span>
 
             <button class="btn-editar-liga" data-liga-id="${id}" title="Editar liga">✏️</button>
+            <button class="btn-excluir-liga" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" title="Excluir liga">🗑️</button>
 
             ${liga.status === "inscricoes" ? `
             <button class="btn-fechar-inscricoes" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
@@ -291,6 +296,18 @@ function criarCardLiga(liga, id, ehAdmin) {
             <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
                 📅 Calendário e Placar
             </button>
+            <button class="btn-iniciar-playoffs" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
+                ⚡ Iniciar Playoffs
+            </button>
+            ` : ""}
+
+            ${liga.status === "playoffs" ? `
+            <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
+                📅 Fase de Grupos
+            </button>
+            <button class="btn-ver-playoffs" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
+                ⚡ Ver Playoffs
+            </button>
             ` : ""}
         </div>
         ` : `
@@ -300,8 +317,13 @@ function criarCardLiga(liga, id, ehAdmin) {
         </button>
         ` : ""}
         ${liga.status === "ativo" ? `
-        <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
+        <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" data-liga-status="ativo">
             📅 Ver Calendário
+        </button>
+        ` : ""}
+        ${liga.status === "playoffs" ? `
+        <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" data-liga-status="playoffs">
+            ⚡ Ver Liga
         </button>
         ` : ""}
         `}
@@ -325,7 +347,9 @@ listaJogador.addEventListener("click", (evento) => {
     }
     const btnCal = evento.target.closest(".btn-ver-calendario");
     if (btnCal) {
-        abrirCalendario(btnCal.dataset.ligaId, btnCal.dataset.ligaNome);
+        // Jogador vai para a view dedicada (não o modal do admin)
+        // data-liga-status indica se está em "ativo" ou "playoffs"
+        abrirViewJogador(btnCal.dataset.ligaId, btnCal.dataset.ligaNome, btnCal.dataset.ligaStatus || "ativo");
     }
 });
 
@@ -335,6 +359,13 @@ listaAdmin.addEventListener("click", async (evento) => {
     const btnEditar = evento.target.closest(".btn-editar-liga");
     if (btnEditar) {
         await abrirEditarLiga(btnEditar.dataset.ligaId);
+        return;
+    }
+
+    // Admin: clicou em "🗑️ Excluir"
+    const btnExcluir = evento.target.closest(".btn-excluir-liga");
+    if (btnExcluir) {
+        await excluirLiga(btnExcluir.dataset.ligaId, btnExcluir.dataset.ligaNome);
         return;
     }
 
@@ -359,6 +390,20 @@ listaAdmin.addEventListener("click", async (evento) => {
     const btnCal = evento.target.closest(".btn-ver-calendario");
     if (btnCal) {
         await abrirCalendario(btnCal.dataset.ligaId, btnCal.dataset.ligaNome);
+        return;
+    }
+
+    // Admin: clicou em "⚡ Iniciar Playoffs"
+    const btnIniciarPo = evento.target.closest(".btn-iniciar-playoffs");
+    if (btnIniciarPo) {
+        abrirModalIniciarPlayoffs(btnIniciarPo.dataset.ligaId, btnIniciarPo.dataset.ligaNome);
+        return;
+    }
+
+    // Admin: clicou em "⚡ Ver Playoffs"
+    const btnVerPo = evento.target.closest(".btn-ver-playoffs");
+    if (btnVerPo) {
+        await abrirModalPlayoffs(btnVerPo.dataset.ligaId, btnVerPo.dataset.ligaNome);
     }
 });
 
@@ -1268,6 +1313,7 @@ function renderizarJogos() {
                 ? `<div class="jogo-btns-admin">
                        ${!finalizado && !cancelado ? `<button class="btn-registrar-placar" data-jogo-id="${jogo.id}">✏️ Placar</button>` : ""}
                        <button class="btn-editar-jogo" data-jogo-id="${jogo.id}">⚙️ Editar</button>
+                       <button class="btn-excluir-jogo" data-jogo-id="${jogo.id}" title="Excluir confronto">🗑️</button>
                    </div>`
                 : "";
 
@@ -1314,6 +1360,13 @@ function renderizarJogos() {
             if (jogo) abrirEditarJogo(jogo);
         });
     });
+
+    // Listener: excluir confronto
+    calJogosEl.querySelectorAll(".btn-excluir-jogo").forEach(btn => {
+        btn.addEventListener("click", () => {
+            excluirJogo(btn.dataset.jogoId);
+        });
+    });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1344,19 +1397,19 @@ function renderizarClassificacao() {
         b.cestas += jogo.placarB;    b.cestasSofridas += jogo.placarA;
 
         if (jogo.placarA > jogo.placarB) {
-            a.v++; a.pts += 2;
-            b.d++; b.pts += 1;
+            a.v++; a.pts += 3;
+            b.d++;            // derrota = 0 pontos
         } else if (jogo.placarB > jogo.placarA) {
-            b.v++; b.pts += 2;
-            a.d++; a.pts += 1;
+            b.v++; b.pts += 3;
+            a.d++;            // derrota = 0 pontos
         } else {
             // Empate (raro em basquete, mas previsto)
-            a.v++; a.pts += 2;
-            b.v++; b.pts += 2;
+            a.v++; a.pts += 1;
+            b.v++; b.pts += 1;
         }
     });
 
-    // Ordena: pts desc → saldo de cestas desc → cestas feitas desc
+    // Ordena: pts desc → saldo de pontos desc → cestas feitas desc
     const ordenado = Object.values(times).sort((x, y) => {
         if (y.pts !== x.pts)  return y.pts - x.pts;
         const saldoX = x.cestas - x.cestasSofridas;
@@ -1394,13 +1447,13 @@ function renderizarClassificacao() {
                     <th title="Jogos">J</th>
                     <th title="Vitórias" class="v">V</th>
                     <th title="Derrotas" class="d">D</th>
-                    <th title="Saldo de Cestas">SC</th>
+                    <th title="Saldo de Pontos">SP</th>
                     <th title="Pontos" class="pts">Pts</th>
                 </tr>
             </thead>
             <tbody>${linhas}</tbody>
         </table>
-        <p class="class-legenda">V=2pts · D=1pt · Critério: Pts → Saldo de cestas</p>
+        <p class="class-legenda">V=3pts · D=0pts · Critério: Pts → Saldo de pontos</p>
     `;
 }
 
@@ -1815,6 +1868,492 @@ btnSalvarNovoJogo.addEventListener("click", async () => {
         btnSalvarNovoJogo.textContent = "Criar Confronto ✅";
     }
 });
+
+// ════════════════════════════════════════════════════════════════
+// VIEW CALENDÁRIO DO JOGADOR — design moderno, tela cheia
+// Substitui o painel do jogador ao clicar "📅 Ver Calendário"
+// Admin continua usando o modal antigo (mais funcional)
+// ════════════════════════════════════════════════════════════════
+
+// Estado da view do jogador (separado do calState do admin)
+let vjcState = {
+    ligaId:   null,
+    ligaNome: "",
+    jogos:    []
+};
+
+// Referências de DOM da view do jogador
+const vjcWrapper      = document.getElementById("view-jogador-calendario");
+const vjcLigaNome     = document.getElementById("vjc-liga-nome");
+const vjcBtnVoltar    = document.getElementById("vjc-btn-voltar");
+const vjcJogosEl      = document.getElementById("vjc-jogos");
+const vjcTimesEl      = document.getElementById("vjc-times");
+const vjcClassEl      = document.getElementById("vjc-classificacao");
+const vjcPlayoffsEl   = document.getElementById("vjc-playoffs");
+const vjcTabs         = document.querySelectorAll(".vjc-tab");
+const vjcTabPlayoffs  = document.querySelector(".vjc-tab-playoffs");
+
+// Botão Voltar: esconde a view e mostra o painel do jogador
+vjcBtnVoltar.addEventListener("click", () => {
+    vjcWrapper.classList.add("oculto");
+    painelJogador.classList.remove("oculto");
+});
+
+// Troca de abas da view
+vjcTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        vjcTabs.forEach(t => t.classList.remove("ativo"));
+        tab.classList.add("ativo");
+
+        vjcJogosEl.classList.add("oculto");
+        vjcTimesEl.classList.add("oculto");
+        vjcClassEl.classList.add("oculto");
+        vjcPlayoffsEl.classList.add("oculto");
+
+        if (tab.dataset.vjcTab === "jogos") {
+            vjcJogosEl.classList.remove("oculto");
+        } else if (tab.dataset.vjcTab === "times") {
+            vjcTimesEl.classList.remove("oculto");
+            renderizarTimesJogador();
+        } else if (tab.dataset.vjcTab === "classificacao") {
+            vjcClassEl.classList.remove("oculto");
+            renderizarClassificacaoJogador();
+        } else if (tab.dataset.vjcTab === "playoffs") {
+            vjcPlayoffsEl.classList.remove("oculto");
+            renderizarPlayoffsJogador();
+        }
+    });
+});
+
+// ─────────────────────────────────────────────────────────────
+// abrirViewJogador(ligaId, ligaNome, ligaStatus)
+// Esconde o painel e abre a view dedicada do jogador
+// ligaStatus: "ativo" | "playoffs" — controla aba visível
+// ─────────────────────────────────────────────────────────────
+async function abrirViewJogador(ligaId, ligaNome, ligaStatus = "ativo") {
+    vjcState.ligaId   = ligaId;
+    vjcState.ligaNome = ligaNome;
+    vjcState.jogos    = [];
+
+    // Atualiza nome da liga no topo
+    vjcLigaNome.textContent = ligaNome;
+
+    // Mostra aba Playoffs só quando a liga está em playoffs
+    if (ligaStatus === "playoffs") {
+        vjcTabPlayoffs.classList.remove("oculto");
+    } else {
+        vjcTabPlayoffs.classList.add("oculto");
+    }
+
+    // Limpa conteúdo anterior
+    vjcJogosEl.innerHTML      = '<p class="vjc-carregando">Carregando jogos...</p>';
+    vjcTimesEl.innerHTML      = '<p class="vjc-carregando">Carregando times...</p>';
+    vjcClassEl.innerHTML      = '<p class="vjc-carregando">Calculando...</p>';
+    vjcPlayoffsEl.innerHTML   = '<p class="vjc-carregando">Carregando playoffs...</p>';
+
+    // Garante aba Jogos ativa
+    vjcTabs.forEach(t => t.classList.toggle("ativo", t.dataset.vjcTab === "jogos"));
+    vjcJogosEl.classList.remove("oculto");
+    vjcTimesEl.classList.add("oculto");
+    vjcClassEl.classList.add("oculto");
+    vjcPlayoffsEl.classList.add("oculto");
+
+    // Transição: esconde painel, mostra a view
+    painelJogador.classList.add("oculto");
+    vjcWrapper.classList.remove("oculto");
+    // Rola para o topo da página
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    try {
+        const q    = query(collection(db, "ligas", ligaId, "jogos"), orderBy("rodada"));
+        const snap = await getDocs(q);
+        vjcState.jogos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderizarJogosJogador();
+    } catch (erro) {
+        console.error("Erro ao carregar jogos:", erro);
+        vjcJogosEl.innerHTML = '<p class="vjc-carregando">Erro ao carregar jogos.</p>';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// renderizarJogosJogador()
+// Renderiza os cards de jogos com design moderno para o jogador
+// ─────────────────────────────────────────────────────────────
+function renderizarJogosJogador() {
+    vjcJogosEl.innerHTML = "";
+
+    if (vjcState.jogos.length === 0) {
+        vjcJogosEl.innerHTML = '<p class="vjc-vazio">Nenhum jogo cadastrado ainda.</p>';
+        return;
+    }
+
+    // Agrupa jogos por rodada
+    const porRodada = {};
+    vjcState.jogos.forEach(jogo => {
+        if (!porRodada[jogo.rodada]) porRodada[jogo.rodada] = [];
+        porRodada[jogo.rodada].push(jogo);
+    });
+
+    // Labels e cores de cada status
+    const statusInfo = {
+        finalizado: { label: "✅ Finalizado",  cls: "status-finalizado" },
+        pendente:   { label: "⏳ Em breve",     cls: "status-pendente"   },
+        cancelado:  { label: "❌ Cancelado",    cls: "status-cancelado"  },
+        adiado:     { label: "📅 Adiado",       cls: "status-adiado"     }
+    };
+
+    Object.keys(porRodada).sort((a, b) => Number(a) - Number(b)).forEach(rodada => {
+        const secao = document.createElement("div");
+        secao.className = "vjc-rodada";
+
+        const jogosHTML = porRodada[rodada].map(jogo => {
+            const finalizado = jogo.status === "finalizado";
+            const cancelado  = jogo.status === "cancelado";
+
+            // Placar: número grande se finalizado, senão "—"
+            const placarA = finalizado ? jogo.placarA : "—";
+            const placarB = finalizado ? jogo.placarB : "—";
+
+            // Destaque para o vencedor
+            const vencedorA = finalizado && jogo.placarA > jogo.placarB;
+            const vencedorB = finalizado && jogo.placarB > jogo.placarA;
+
+            // Formata data se existir
+            let dataFormatada = "";
+            if (jogo.data) {
+                const [ano, mes, dia] = jogo.data.split("-");
+                const nomesMes = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+                dataFormatada = `${dia} ${nomesMes[parseInt(mes, 10) - 1]}`;
+            }
+
+            // Linha de meta info (data, hora, local)
+            const metaItens = [];
+            if (dataFormatada || jogo.hora) metaItens.push(`📅 ${[dataFormatada, jogo.hora].filter(Boolean).join(" · ")}`);
+            if (jogo.local)                 metaItens.push(`📍 ${jogo.local}`);
+            const meta = metaItens.length ? `<div class="vjc-card-meta">${metaItens.join("<span class='vjc-sep'>|</span>")}</div>` : "";
+
+            // Observação
+            const obs = jogo.obs ? `<div class="vjc-card-obs">💬 ${jogo.obs}</div>` : "";
+
+            // Badge de status
+            const si = statusInfo[jogo.status] || { label: jogo.status, cls: "" };
+
+            return `
+                <div class="vjc-card ${cancelado ? "vjc-card-cancelado" : ""}">
+                    <span class="vjc-card-status ${si.cls}">${si.label}</span>
+
+                    <div class="vjc-card-confronto">
+                        <!-- Time A -->
+                        <div class="vjc-time ${vencedorA ? "vjc-vencedor" : ""}">
+                            <span class="vjc-time-barra" style="background: ${jogo.timeA.cor}"></span>
+                            <span class="vjc-time-nome">${jogo.timeA.nome}</span>
+                        </div>
+
+                        <!-- Placar central -->
+                        <div class="vjc-placar">
+                            <span class="vjc-placar-num ${vencedorA ? "vjc-vencedor-num" : ""}">${placarA}</span>
+                            <span class="vjc-placar-sep">×</span>
+                            <span class="vjc-placar-num ${vencedorB ? "vjc-vencedor-num" : ""}">${placarB}</span>
+                        </div>
+
+                        <!-- Time B -->
+                        <div class="vjc-time vjc-time-direita ${vencedorB ? "vjc-vencedor" : ""}">
+                            <span class="vjc-time-nome">${jogo.timeB.nome}</span>
+                            <span class="vjc-time-barra" style="background: ${jogo.timeB.cor}"></span>
+                        </div>
+                    </div>
+
+                    ${meta}
+                    ${obs}
+                </div>
+            `;
+        }).join("");
+
+        secao.innerHTML = `
+            <div class="vjc-rodada-label">Rodada ${rodada}</div>
+            <div class="vjc-rodada-jogos">${jogosHTML}</div>
+        `;
+
+        vjcJogosEl.appendChild(secao);
+    });
+}
+
+// ─────────────────────────────────────────────────────────────
+// renderizarTimesJogador()
+// Lista todos os times da liga em ordem alfabética, mostrando
+// os jogadores de cada time e a posição na classificação atual
+// ─────────────────────────────────────────────────────────────
+async function renderizarTimesJogador() {
+    vjcTimesEl.innerHTML = '<p class="vjc-carregando">Carregando times...</p>';
+
+    try {
+        // Carrega times e jogadores em paralelo
+        const [timesSnap, jogadoresSnap] = await Promise.all([
+            getDocs(collection(db, "ligas", vjcState.ligaId, "times")),
+            getDocs(collection(db, "ligas", vjcState.ligaId, "inscricoes"))
+        ]);
+
+        const times = timesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        if (times.length === 0) {
+            vjcTimesEl.innerHTML = '<p class="vjc-vazio">Nenhum time formado ainda.</p>';
+            return;
+        }
+
+        // Mapeia uid → dados do inscrito (nome, posição)
+        const jogadoresMap = {};
+        jogadoresSnap.docs.forEach(d => {
+            jogadoresMap[d.id] = d.data();
+        });
+
+        // Calcula classificação com os jogos já carregados em vjcState.jogos
+        const classificacao = calcularClassificacaoLista(vjcState.jogos);
+        // Cria um mapa timeId → posição (1-based)
+        const posMap = {};
+        classificacao.forEach((t, i) => { posMap[t.id] = i + 1; });
+
+        // Ordena times alfabeticamente
+        const timesOrdenados = [...times].sort((a, b) =>
+            a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+        );
+
+        const total = classificacao.length;
+
+        const cardsHTML = timesOrdenados.map(time => {
+            const pos = posMap[time.id];
+            let posLabel = "";
+            let posClasse = "";
+
+            if (pos === 1) {
+                posLabel  = "🥇 1º lugar";
+                posClasse = "vjc-time-pos-ouro";
+            } else if (pos === 2) {
+                posLabel  = "🥈 2º lugar";
+                posClasse = "vjc-time-pos-prata";
+            } else if (pos === 3) {
+                posLabel  = "🥉 3º lugar";
+                posClasse = "vjc-time-pos-bronze";
+            } else if (pos) {
+                // Últimos 3 = zona vermelha
+                const zonaRebaixamento = total > 3 && pos > total - 3;
+                posLabel  = `${pos}º lugar`;
+                posClasse = zonaRebaixamento ? "vjc-time-pos-zona" : "vjc-time-pos-normal";
+            }
+
+            // Lista de jogadores (de jogadores[] no documento do time)
+            const jogadores = (time.jogadores || []);
+            const jogadoresHTML = jogadores.length > 0
+                ? jogadores.map(j => {
+                    const dados = jogadoresMap[j.uid] || {};
+                    const posicao = dados.posicao || j.posicao || "";
+                    return `
+                        <div class="vjc-time-jogador">
+                            <span class="vjc-time-jogador-nome">${j.nomeJogador || dados.nomeJogador || "Jogador"}</span>
+                            ${posicao ? `<span class="vjc-time-jogador-pos">${posicao}</span>` : ""}
+                        </div>
+                    `;
+                }).join("")
+                : '<span class="vjc-time-sem-jogadores">Nenhum jogador</span>';
+
+            return `
+                <div class="vjc-time-card">
+                    <div class="vjc-time-card-header" style="border-left: 4px solid ${time.cor || '#555'}">
+                        <div class="vjc-time-card-info">
+                            <span class="vjc-time-card-nome">${time.nome}</span>
+                            ${posLabel ? `<span class="vjc-time-pos-badge ${posClasse}">${posLabel}</span>` : ""}
+                        </div>
+                    </div>
+                    <div class="vjc-time-card-jogadores">
+                        ${jogadoresHTML}
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        vjcTimesEl.innerHTML = `<div class="vjc-times-lista">${cardsHTML}</div>`;
+
+    } catch (erro) {
+        console.error("Erro ao carregar times:", erro);
+        vjcTimesEl.innerHTML = '<p class="vjc-vazio">Erro ao carregar times.</p>';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// renderizarClassificacaoJogador()
+// Tabela de classificação estilizada para a view do jogador
+// Mesma lógica do admin (V=2pts, D=1pt), visual diferente
+// ─────────────────────────────────────────────────────────────
+function renderizarClassificacaoJogador() {
+    // Coleta times únicos
+    const times = {};
+    vjcState.jogos.forEach(jogo => {
+        [jogo.timeA, jogo.timeB].forEach(t => {
+            if (!times[t.id]) {
+                times[t.id] = { nome: t.nome, cor: t.cor, j: 0, v: 0, d: 0, pts: 0, cestas: 0, cestasSofridas: 0 };
+            }
+        });
+    });
+
+    // Calcula resultados
+    vjcState.jogos.filter(j => j.status === "finalizado").forEach(jogo => {
+        const a = times[jogo.timeA.id];
+        const b = times[jogo.timeB.id];
+        if (!a || !b) return;
+
+        a.j++; b.j++;
+        a.cestas += jogo.placarA;    a.cestasSofridas += jogo.placarB;
+        b.cestas += jogo.placarB;    b.cestasSofridas += jogo.placarA;
+
+        if (jogo.placarA > jogo.placarB) {
+            a.v++; a.pts += 3; b.d++;  // derrota = 0 pontos
+        } else if (jogo.placarB > jogo.placarA) {
+            b.v++; b.pts += 3; a.d++;  // derrota = 0 pontos
+        } else {
+            a.v++; a.pts += 1; b.v++; b.pts += 1;
+        }
+    });
+
+    // Ordena: pts → saldo de pontos → cestas feitas
+    const ordenado = Object.values(times).sort((x, y) => {
+        if (y.pts !== x.pts) return y.pts - x.pts;
+        const sx = x.cestas - x.cestasSofridas;
+        const sy = y.cestas - y.cestasSofridas;
+        if (sy !== sx) return sy - sx;
+        return y.cestas - x.cestas;
+    });
+
+    if (ordenado.length === 0) {
+        vjcClassEl.innerHTML = '<p class="vjc-vazio">Nenhum resultado ainda.</p>';
+        return;
+    }
+
+    const total = ordenado.length;
+
+    // Medalhas para os 3 primeiros
+    const medalhas = ["🥇", "🥈", "🥉"];
+    // Classes de destaque
+    const classesPosicao = [
+        "vjc-class-ouro",
+        "vjc-class-prata",
+        "vjc-class-bronze"
+    ];
+
+    // Cards de classificação (um por time)
+    const cardsHTML = ordenado.map((t, i) => {
+        const posLabel  = i < 3 ? medalhas[i] : `${i + 1}º`;
+        const classePos = i < 3 ? classesPosicao[i] : (i >= total - 3 && total > 3 ? "vjc-class-zona-rebaixamento" : "");
+        const saldo    = t.cestas - t.cestasSofridas;
+        const saldoStr = saldo >= 0 ? `+${saldo}` : `${saldo}`;
+
+        return `
+            <div class="vjc-class-card ${classePos}">
+                <div class="vjc-class-pos">${posLabel}</div>
+                <span class="vjc-class-cor" style="background: ${t.cor}"></span>
+                <div class="vjc-class-info">
+                    <span class="vjc-class-nome">${t.nome}</span>
+                    <div class="vjc-class-stats">
+                        <span title="Jogos">J <strong>${t.j}</strong></span>
+                        <span title="Vitórias" class="vjc-stat-v">V <strong>${t.v}</strong></span>
+                        <span title="Derrotas" class="vjc-stat-d">D <strong>${t.d}</strong></span>
+                        <span title="Saldo de pontos">SP <strong>${saldoStr}</strong></span>
+                    </div>
+                </div>
+                <div class="vjc-class-pts">${t.pts}<small>pts</small></div>
+            </div>
+        `;
+    }).join("");
+
+    vjcClassEl.innerHTML = `
+        <div class="vjc-class-lista">${cardsHTML}</div>
+        <p class="vjc-class-legenda">V = 3pts · D = 0pts · Critério de desempate: Saldo de pontos</p>
+    `;
+}
+// ================================================================
+// PLAYOFFS - inicializado em scripts/liga/playoffs.js
+// ================================================================
+
+// Estas variaveis sao preenchidas por initPlayoffs() logo abaixo.
+// Precisam estar no escopo do modulo para que os event listeners acima as usem.
+let abrirModalIniciarPlayoffs, abrirModalPlayoffs, renderizarPlayoffsJogador;
+
+({  abrirModalIniciarPlayoffs,
+    abrirModalPlayoffs,
+    renderizarPlayoffsJogador
+} = initPlayoffs({
+    db, collection, doc, getDocs, updateDoc, writeBatch,
+    serverTimestamp, query, orderBy,
+    mostrarFeedback,
+    carregarLigasAdmin,
+    getVjcState:      () => vjcState,
+    getVjcPlayoffsEl: () => document.getElementById('vjc-playoffs')
+}));
+
+// ════════════════════════════════════════════════════════════════
+// EXCLUSÃO — Jogo e Liga
+// ════════════════════════════════════════════════════════════════
+
+// ─────────────────────────────────────────────────────────────
+// excluirJogo(jogoId)
+// Remove um confronto do Firestore e atualiza a lista local
+// ─────────────────────────────────────────────────────────────
+async function excluirJogo(jogoId) {
+    // Pede confirmação antes de excluir (ação irreversível)
+    const confirmado = window.confirm("Tem certeza que quer excluir este confronto? Essa ação não pode ser desfeita.");
+    if (!confirmado) return;
+
+    try {
+        // Deleta o documento do jogo no Firestore
+        await deleteDoc(doc(db, "ligas", calState.ligaId, "jogos", jogoId));
+
+        // Remove o jogo da lista local para atualizar a tela sem recarregar
+        calState.jogos = calState.jogos.filter(j => j.id !== jogoId);
+        renderizarJogos();
+        mostrarFeedback("Confronto excluído.", "sucesso");
+    } catch (erro) {
+        console.error("Erro ao excluir jogo:", erro);
+        mostrarFeedback("Erro ao excluir confronto.", "erro");
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// excluirLiga(ligaId, ligaNome)
+// Exclui a liga e todas as suas subcoleções (inscricoes, times, jogos)
+// Note: no Firestore, excluir um documento NÃO exclui subcoleções
+// automaticamente — temos que deletar cada uma manualmente
+// ─────────────────────────────────────────────────────────────
+async function excluirLiga(ligaId, ligaNome) {
+    // Confirmação dupla: primeira com o nome da liga
+    const confirmado = window.confirm(`Excluir a liga "${ligaNome}"? Todos os times, jogos e inscrições serão apagados permanentemente.`);
+    if (!confirmado) return;
+
+    mostrarFeedback("Excluindo liga...", "info");
+
+    try {
+        // Exclui cada subcoleção manualmente (obrigatório no Firestore via SDK)
+        const subcolecoes = ["inscricoes", "times", "jogos"];
+
+        for (const subNome of subcolecoes) {
+            // Busca todos os documentos da subcoleção
+            const subRef = collection(db, "ligas", ligaId, subNome);
+            const snap = await getDocs(subRef);
+            // Deleta cada um
+            for (const docSnap of snap.docs) {
+                await deleteDoc(docSnap.ref);
+            }
+        }
+
+        // Depois de limpar as subcoleções, exclui o documento principal
+        await deleteDoc(doc(db, "ligas", ligaId));
+
+        mostrarFeedback(`Liga "${ligaNome}" excluída.`, "sucesso");
+
+        // Recarrega a lista de ligas do admin
+        await carregarLigasAdmin();
+    } catch (erro) {
+        console.error("Erro ao excluir liga:", erro);
+        mostrarFeedback("Erro ao excluir liga.", "erro");
+    }
+}
 
 // ════════════════════════════════════════════════════════════════
 // UTILITÁRIOS
