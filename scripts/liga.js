@@ -326,6 +326,11 @@ function criarCardLiga(liga, id, ehAdmin) {
             ⚡ Ver Liga
         </button>
         ` : ""}
+        ${liga.status === "encerrado" ? `
+        <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" data-liga-status="encerrado">
+            🏆 Ver Resultados
+        </button>
+        ` : ""}
         `}
     `;
 
@@ -1938,8 +1943,8 @@ async function abrirViewJogador(ligaId, ligaNome, ligaStatus = "ativo") {
     // Atualiza nome da liga no topo
     vjcLigaNome.textContent = ligaNome;
 
-    // Mostra aba Playoffs só quando a liga está em playoffs
-    if (ligaStatus === "playoffs") {
+    // Mostra aba Playoffs quando a liga está em playoffs ou encerrada
+    if (ligaStatus === "playoffs" || ligaStatus === "encerrado") {
         vjcTabPlayoffs.classList.remove("oculto");
     } else {
         vjcTabPlayoffs.classList.add("oculto");
@@ -2146,20 +2151,32 @@ async function renderizarTimesJogador() {
                 ? jogadores.map(j => {
                     const dados = jogadoresMap[j.uid] || {};
                     const posicao = dados.posicao || j.posicao || "";
+                    // Mapeia posição para classe de cor
+                    const posClasses = {
+                        "armador":     "vjc-pos-pg",
+                        "ala-armador": "vjc-pos-sg",
+                        "ala-pivô":    "vjc-pos-pf",
+                        "ala-pivo":    "vjc-pos-pf",
+                        "pivô":        "vjc-pos-c",
+                        "pivo":        "vjc-pos-c",
+                        "ala":         "vjc-pos-sf"
+                    };
+                    const posKey = Object.keys(posClasses).find(k => posicao.toLowerCase().includes(k)) || "";
+                    const posCorClasse = posClasses[posKey] || "";
                     return `
                         <div class="vjc-time-jogador">
                             <span class="vjc-time-jogador-nome">${j.nomeJogador || dados.nomeJogador || "Jogador"}</span>
-                            ${posicao ? `<span class="vjc-time-jogador-pos">${posicao}</span>` : ""}
+                            ${posicao ? `<span class="vjc-time-jogador-pos ${posCorClasse}">${posicao}</span>` : ""}
                         </div>
                     `;
                 }).join("")
                 : '<span class="vjc-time-sem-jogadores">Nenhum jogador</span>';
 
             return `
-                <div class="vjc-time-card">
-                    <div class="vjc-time-card-header" style="border-left: 4px solid ${time.cor || '#555'}">
+                <div class="vjc-time-card" style="border-top: 3px solid ${time.cor || '#555'}">
+                    <div class="vjc-time-card-header">
                         <div class="vjc-time-card-info">
-                            <span class="vjc-time-card-nome">${time.nome}</span>
+                            <span class="vjc-time-card-nome" style="color:${time.cor || '#fff'}">${time.nome}</span>
                             ${posLabel ? `<span class="vjc-time-pos-badge ${posClasse}">${posLabel}</span>` : ""}
                         </div>
                     </div>
@@ -2363,6 +2380,11 @@ async function lerRole(uid) {
     try {
         const snap = await getDoc(doc(db, "users", uid));
         if (snap.exists() && snap.data().role) return snap.data().role;
+
+        // Documento não existe: usuário novo que ainda não tem registro no Firestore.
+        // Cria com role padrão "jogador" para que as regras de segurança
+        // reconheçam o usuário e permitam leitura das ligas.
+        await setDoc(doc(db, "users", uid), { role: "jogador" });
         return "jogador";
     } catch (erro) {
         console.error("Erro ao ler role:", erro);

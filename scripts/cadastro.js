@@ -5,12 +5,18 @@
 // ─────────────────────────────────────────────────────────────
 
 import { auth } from "./firebase-config.js";
+import { db } from "./firebase-config.js";
 
 import {
     createUserWithEmailAndPassword, // cria conta com e-mail + senha
     updateProfile,                  // atualiza dados do perfil (ex: nome)
     sendEmailVerification           // envia e-mail de confirmação
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+import {
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ─────────────────────────────────────────────────────────────
 // Helpers de UI
@@ -73,6 +79,11 @@ async function cadastrar() {
         // ── Salva o nome do jogador no perfil Firebase ────────
         // updateProfile atualiza campos extras do usuário logado
         await updateProfile(credencial.user, { displayName: nome });
+
+        // ── Cria documento do usuário no Firestore ────────────
+        // Necessário para que as regras de segurança reconheçam
+        // o usuário e permitam leitura das ligas.
+        await setDoc(doc(db, "users", credencial.user.uid), { role: "jogador" });
 
         // ── Envia e-mail de verificação automaticamente ───────
         // O jogador recebe um link no e-mail cadastrado.

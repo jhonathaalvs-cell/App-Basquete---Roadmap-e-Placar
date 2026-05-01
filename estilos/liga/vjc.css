@@ -439,119 +439,163 @@
 .vjc-times-lista {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
 /* Card do time */
 .vjc-time-card {
-    background: #161616;
+    background: #141414;
     border: 1px solid #252525;
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    transition: border-color 0.2s, transform 0.15s;
+    transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
 }
 
 .vjc-time-card:hover {
-    border-color: #333;
-    transform: translateY(-1px);
+    border-color: #383838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* Header: barra colorida à esquerda + nome + badge de posição */
+/* Header: faixa colorida no topo (border-top via inline style) + nome centralizado */
 .vjc-time-card-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0;
-    padding: 14px 18px 12px 16px;
-    border-bottom: 1px solid #1e1e1e;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    /* border-left: 4px vem via style inline — substituído por border-top no JS */
+    text-align: center;
+    position: relative;
+}
+
+/* Linha colorida decorativa no topo do header (injetada via JS com border-left,
+   mas aproveitamos o padding-top e o border-left para criar efeito visual) */
+.vjc-time-card-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: inherit; /* sobrescrito pelo JS via style na div */
+    border-radius: 16px 16px 0 0;
+    opacity: 0;           /* decorativo; a cor real vem do border-left inline */
 }
 
 .vjc-time-card-info {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex: 1;
-    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
 }
 
 .vjc-time-card-nome {
-    font-size: 16px;
-    font-weight: 700;
-    color: #f0f0f0;
+    font-family: 'Barlow Condensed', 'Impact', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
 }
 
 /* Badge de posição na classificação */
 .vjc-time-pos-badge {
     font-size: 12px;
     font-weight: 700;
-    padding: 3px 10px;
+    padding: 4px 14px;
     border-radius: 20px;
     white-space: nowrap;
+    letter-spacing: 0.3px;
 }
 
 .vjc-time-pos-ouro {
-    background: rgba(255, 193, 7, 0.12);
+    background: rgba(255, 193, 7, 0.15);
     color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    border: 1px solid rgba(255, 193, 7, 0.35);
 }
 
 .vjc-time-pos-prata {
-    background: rgba(176, 190, 197, 0.1);
+    background: rgba(176, 190, 197, 0.12);
     color: #b0bec5;
-    border: 1px solid rgba(176, 190, 197, 0.25);
+    border: 1px solid rgba(176, 190, 197, 0.3);
 }
 
 .vjc-time-pos-bronze {
-    background: rgba(205, 127, 50, 0.12);
+    background: rgba(205, 127, 50, 0.15);
     color: #cd7f32;
-    border: 1px solid rgba(205, 127, 50, 0.3);
+    border: 1px solid rgba(205, 127, 50, 0.35);
 }
 
 .vjc-time-pos-zona {
-    background: rgba(231, 76, 60, 0.1);
+    background: rgba(231, 76, 60, 0.12);
     color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.25);
+    border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
 .vjc-time-pos-normal {
     background: rgba(255, 255, 255, 0.05);
-    color: #888;
-    border: 1px solid #333;
+    color: #777;
+    border: 1px solid #2e2e2e;
 }
 
 /* Lista de jogadores dentro do card */
 .vjc-time-card-jogadores {
-    padding: 12px 18px 14px;
+    padding: 4px 0 6px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
+    border-top: 1px solid #1e1e1e;
 }
 
 .vjc-time-jogador {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
+    padding: 11px 20px;
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.15s;
+}
+
+.vjc-time-jogador:last-child {
+    border-bottom: none;
+}
+
+.vjc-time-jogador:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .vjc-time-jogador-nome {
-    font-size: 14px;
-    color: #ccc;
-    font-weight: 500;
+    font-size: 15px;
+    color: #e0e0e0;
+    font-weight: 600;
 }
 
 .vjc-time-jogador-pos {
     font-size: 11px;
-    color: #888;
+    color: #999;
     background: #1e1e1e;
     border: 1px solid #2a2a2a;
     border-radius: 8px;
-    padding: 2px 8px;
+    padding: 3px 10px;
     white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
 .vjc-time-sem-jogadores {
     font-size: 13px;
     color: #555;
     font-style: italic;
+    padding: 14px 20px;
 }
+
+/* ─── Cores por posição ─── */
+.vjc-pos-pg  { color: #4fc3f7; background: rgba(79, 195, 247, 0.1);  border-color: rgba(79, 195, 247, 0.25); }  /* Armador       — azul  */
+.vjc-pos-sg  { color: #69f0ae; background: rgba(105, 240, 174, 0.1); border-color: rgba(105, 240, 174, 0.25); } /* Ala-Armador   — verde */
+.vjc-pos-sf  { color: #ffb74d; background: rgba(255, 183, 77, 0.1);  border-color: rgba(255, 183, 77, 0.25); }  /* Ala           — laranja */
+.vjc-pos-pf  { color: #ce93d8; background: rgba(206, 147, 216, 0.1); border-color: rgba(206, 147, 216, 0.25); } /* Ala-Pivô      — roxo */
+.vjc-pos-c   { color: #ef9a9a; background: rgba(239, 154, 154, 0.1); border-color: rgba(239, 154, 154, 0.25); } /* Pivô          — vermelho */
