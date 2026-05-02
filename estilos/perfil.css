@@ -13,14 +13,120 @@ body {
     background-color: #0d0d0d;
     min-height: 100vh;
     display: flex;
-    flex-direction: column; /* empilha section + msg-feedback verticalmente */
-    align-items: center;   /* centraliza horizontalmente na tela */
+    flex-direction: column;
+    align-items: center;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 /* Oculta uma seção (alterna entre view e edit) */
 .oculto {
     display: none !important;
+}
+
+/* ════════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════════ */
+.main-header {
+    width: 100%;
+    max-width: 750px;
+    padding-bottom: 15px;
+}
+
+.logo-area {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+.logo-app {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    max-width: 300px;
+    min-width: 100px;
+}
+
+/* ════════════════════════════════════════════════════
+   NAVBAR
+════════════════════════════════════════════════════ */
+.nav-bar {
+    background-color: rgba(0, 0, 0, 0.904);
+    border-radius: 5px;
+    padding: 10px 8px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 750px;
+    margin-bottom: 20px;
+}
+
+.link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    padding: 6px 20px;
+    transition: 0.4s;
+}
+
+.link:hover {
+    color: rgb(27, 27, 27);
+    background: rgba(255, 255, 255, 0.493);
+    box-shadow: 0 0 5px rgb(209, 209, 209);
+}
+
+.link.ativo {
+    border-color: #ff8c00;
+    color: #ff8c00;
+}
+
+/* ════════════════════════════════════════════════════
+   NAVBAR BOTTOM (fixa na parte de baixo)
+════════════════════════════════════════════════════ */
+.nav-bar-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 750px;
+    background-color: rgba(10, 10, 10, 0.97);
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0 14px;
+    z-index: 100;
+}
+
+.link-bottom {
+    color: #888;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 14px;
+    border-radius: 10px;
+    transition: color 0.2s;
+}
+
+.link-bottom:hover {
+    color: #fff;
+}
+
+.link-bottom.ativo {
+    color: #ff8c00;
+}
+
+/* Espaço para o conteúdo não ficar atras da nav bottom */
+body {
+    padding-bottom: 70px;
 }
 
 /* ════════════════════════════════════════════════════

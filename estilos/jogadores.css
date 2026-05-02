@@ -1,0 +1,297 @@
+@charset "UTF-8";
+
+/* ════════════════════════════════════════════════════
+   BASE
+════════════════════════════════════════════════════ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d0d0d;
+    min-height: 100vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: #fff;
+}
+
+.oculto { display: none !important; }
+
+/* ════════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════════ */
+.main-header {
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto;
+    padding-bottom: 10px;
+}
+
+.logo-area {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+.logo-app {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    max-width: 300px;
+    min-width: 100px;
+}
+
+/* ════════════════════════════════════════════════════
+   NAVBAR
+════════════════════════════════════════════════════ */
+.nav-bar {
+    background-color: rgba(0, 0, 0, 0.904);
+    border-radius: 5px;
+    padding: 10px 8px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto 20px;
+}
+
+.link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    padding: 6px 20px;
+    transition: 0.4s;
+}
+
+.link:hover {
+    color: rgb(27, 27, 27);
+    background: rgba(255, 255, 255, 0.493);
+    box-shadow: 0 0 5px rgb(209, 209, 209);
+}
+
+.link.ativo {
+    border-color: #ff8c00;
+    color: #ff8c00;
+}
+
+/* ════════════════════════════════════════════════════
+   CONTAINER PRINCIPAL
+════════════════════════════════════════════════════ */
+.jog-container {
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+}
+
+.jog-loading {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    padding: 60px 0;
+}
+
+.jog-vazio {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    padding: 60px 0;
+}
+
+/* ════════════════════════════════════════════════════
+   FILTROS
+════════════════════════════════════════════════════ */
+.jog-filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.jog-select {
+    background: #161616;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #ccc;
+    font-size: 13px;
+    padding: 8px 14px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    flex: 1;
+    min-width: 180px;
+}
+
+.jog-select:focus {
+    border-color: #ff8c00;
+}
+
+/* ════════════════════════════════════════════════════
+   SEÇÃO DE LIGA
+════════════════════════════════════════════════════ */
+.jog-secao {
+    margin-bottom: 32px;
+}
+
+.jog-secao-titulo {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ff8c00;
+    margin-bottom: 14px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jog-secao-titulo::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #222;
+}
+
+/* ════════════════════════════════════════════════════
+   LISTA E CARDS
+════════════════════════════════════════════════════ */
+.jog-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.jog-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 0;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.15s;
+}
+
+.jog-card:first-child { border-radius: 12px 12px 0 0; }
+.jog-card:last-child  { border-radius: 0 0 12px 12px; border-bottom: none; }
+.jog-card:only-child  { border-radius: 12px; }
+
+.jog-card:hover {
+    background: #1a1a1a;
+}
+
+/* Número do jogador na lista */
+.jog-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Bolinha com a cor do time */
+.jog-time-cor {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Info principal */
+.jog-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.jog-nome {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e8e8e8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jog-time-nome {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Bio do jogador (reservado, não usado atualmente) */
+.jog-bio {
+    display: none;
+}
+
+/* Porcentagem de vitórias */
+.jog-pct {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+.jog-pct-alto  { color: #69f0ae; }   /* ≥ 60% — verde  */
+.jog-pct-medio { color: #ff8c00; }   /* 40-59% — laranja */
+.jog-pct-baixo { color: #ef9a9a; }   /* < 40% — vermelho */
+.jog-pct-nd    { color: #333; font-size: 16px; }
+
+.jog-pct-label {
+    font-size: 10px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Coluna direita: badge de posição + contador de inscrições */
+.jog-direita {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.jog-inscricoes {
+    font-size: 11px;
+    color: #444;
+    white-space: nowrap;
+}
+
+/* Badge de posição (agora dentro de .jog-info) */
+.jog-pos {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 5px;
+    white-space: nowrap;
+}
+
+/* Cores por posição */
+.jog-pos-pg { color: #4fc3f7; background: rgba(79,195,247,0.1);  border: 1px solid rgba(79,195,247,0.25); }
+.jog-pos-sg { color: #69f0ae; background: rgba(105,240,174,0.1); border: 1px solid rgba(105,240,174,0.25); }
+.jog-pos-sf { color: #ffb74d; background: rgba(255,183,77,0.1);  border: 1px solid rgba(255,183,77,0.25); }
+.jog-pos-pf { color: #ce93d8; background: rgba(206,147,216,0.1); border: 1px solid rgba(206,147,216,0.25); }
+.jog-pos-c  { color: #ef9a9a; background: rgba(239,154,154,0.1); border: 1px solid rgba(239,154,154,0.25); }
+.jog-pos-nd { color: #666;    background: rgba(255,255,255,0.04); border: 1px solid #2a2a2a; }
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVO
+════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .jog-card { padding: 12px 12px; gap: 10px; }
+    .jog-nome { font-size: 14px; }
+    .jog-pos  { font-size: 10px; padding: 2px 8px; }
+}

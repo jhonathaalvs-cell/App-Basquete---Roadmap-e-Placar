@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogadores</title>
+    <link rel="shortcut icon" href="imagens/favicon.png" type="image/png">
+    <link rel="stylesheet" href="estilos/jogadores.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-area">
+            <img src="imagens/icone.png" alt="icone" class="logo-app">
+        </div>
+    </header>
+
+    <nav class="nav-bar">
+        <a href="hub.html" class="link">hub</a>
+        <a href="liga.html" class="link">liga</a>
+        <a href="jogadores.html" class="link ativo">jogadores</a>
+        <a href="perfil.html" class="link">perfil</a>
+    </nav>
+
+    <main class="jog-container">
+
+        <div id="tela-loading" class="jog-loading">Carregando jogadores...</div>
+
+        <!-- Filtro por liga -->
+        <div id="filtros" class="jog-filtros oculto">
+            <select id="select-liga" class="jog-select">
+                <option value="">Todas as ligas</option>
+            </select>
+        </div>
+
+        <!-- Lista de cards -->
+        <div id="lista-jogadores" class="jog-lista"></div>
+
+    </main>
+
+    <script type="module" src="scripts/jogadores.js"></script>
+</body>
+</html>

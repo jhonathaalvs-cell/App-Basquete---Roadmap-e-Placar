@@ -327,10 +327,11 @@ body {
 }
 
 /* Cor do badge muda conforme o status da liga */
-.badge-status.inscricoes { background-color: rgba(0, 200, 80, 0.15); color: #00c850; }
-.badge-status.draft      { background-color: rgba(255, 200, 0, 0.15); color: #ffc800; }
-.badge-status.ativo      { background-color: rgba(255, 60, 60, 0.15);  color: #ff3c3c; }
-.badge-status.encerrado  { background-color: rgba(100, 100, 100, 0.15); color: #888; }
+.badge-status.inscricoes  { background-color: rgba(0, 200, 80, 0.15);   color: #00c850; }
+.badge-status.draft       { background-color: rgba(255, 200, 0, 0.15);  color: #ffc800; }
+.badge-status.nomes_times { background-color: rgba(255, 140, 0, 0.15);  color: #ff8c00; }
+.badge-status.ativo       { background-color: rgba(255, 60, 60, 0.15);  color: #ff3c3c; }
+.badge-status.encerrado   { background-color: rgba(100, 100, 100, 0.15); color: #888;   }
 
 /* â”€â”€â”€ AÃ§Ãµes do card (admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card-acoes-admin {

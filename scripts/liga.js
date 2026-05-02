@@ -197,7 +197,7 @@ async function carregarLigasJogador() {
 
         const ligasVisiveis = snap.docs.filter(d => {
             const s = d.data().status;
-            return s === "inscricoes" || s === "ativo" || s === "playoffs" || s === "encerrado";
+            return s === "inscricoes" || s === "nomes_times" || s === "ativo" || s === "playoffs" || s === "encerrado";
         });
 
         if (ligasVisiveis.length === 0) {
@@ -245,11 +245,12 @@ function criarCardLiga(liga, id, ehAdmin) {
     card.classList.add("card-liga");
 
     const statusTexto = {
-        inscricoes: "🟢 Inscrições abertas",
-        draft:      "🟡 Montando times",
-        ativo:      "🔴 Em andamento",
-        playoffs:   "⚡ Playoffs",
-        encerrado:  "⚫ Encerrado"
+        inscricoes:  "🟢 Inscrições abertas",
+        draft:       "🟡 Montando times",
+        nomes_times: "🏷️ Definindo nomes",
+        ativo:       "🔴 Em andamento",
+        playoffs:    "⚡ Playoffs",
+        encerrado:   "⚫ Encerrado"
     };
 
     const dataFormatada = liga.dataInicio
@@ -292,6 +293,15 @@ function criarCardLiga(liga, id, ehAdmin) {
             </button>
             ` : ""}
 
+            ${liga.status === "nomes_times" ? `
+            <button class="btn-gerar-rodadas" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
+                🎯 Gerar Rodadas
+            </button>
+            <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" data-aba="times">
+                📖 Ver Times
+            </button>
+            ` : ""}
+
             ${liga.status === "ativo" ? `
             <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
                 📅 Calendário e Placar
@@ -314,6 +324,11 @@ function criarCardLiga(liga, id, ehAdmin) {
         ${liga.status === "inscricoes" ? `
         <button class="btn-inscricao" data-liga-id="${id}" data-liga-nome="${nomeEscapado}">
             Ver Liga
+        </button>
+        ` : ""}
+        ${liga.status === "nomes_times" ? `
+        <button class="btn-ver-calendario" data-liga-id="${id}" data-liga-nome="${nomeEscapado}" data-liga-status="nomes_times">
+            👀 Ver Times
         </button>
         ` : ""}
         ${liga.status === "ativo" ? `
@@ -391,10 +406,17 @@ listaAdmin.addEventListener("click", async (evento) => {
         return;
     }
 
-    // Admin: clicou em "Calendário e Placar"
+    // Admin: clicou em "🎯 Gerar Rodadas"
+    const btnGerarRodadas = evento.target.closest(".btn-gerar-rodadas");
+    if (btnGerarRodadas) {
+        await confirmarEGerarRodadas(btnGerarRodadas.dataset.ligaId, btnGerarRodadas.dataset.ligaNome);
+        return;
+    }
+
+    // Admin: clicou em "Calendário e Placar" ou "📖 Ver Times"
     const btnCal = evento.target.closest(".btn-ver-calendario");
     if (btnCal) {
-        await abrirCalendario(btnCal.dataset.ligaId, btnCal.dataset.ligaNome);
+        await abrirCalendario(btnCal.dataset.ligaId, btnCal.dataset.ligaNome, btnCal.dataset.aba || "jogos");
         return;
     }
 
@@ -966,15 +988,13 @@ btnSalvarDraft.addEventListener("click", async () => {
             });
         });
 
-        // Avança status da liga para "ativo"
-        batch.update(doc(db, "ligas", draftState.ligaId), { status: "ativo" });
+        // Avança status da liga para "nomes_times"
+        // (jogadores ainda vão definir o nome do time antes de gerar as rodadas)
+        batch.update(doc(db, "ligas", draftState.ligaId), { status: "nomes_times" });
 
         await batch.commit();
 
-        // Gera o calendário round-robin com os times salvos
-        await gerarCalendario(draftState.ligaId, draftState.times);
-
-        mostrarFeedback("Times salvos! Liga está agora em andamento. 🏆", "sucesso");
+        mostrarFeedback("Times formados! Agora os jogadores podem definir o nome do time. 🏷️", "sucesso");
         fecharDraft();
         await carregarLigasAdmin();
 
@@ -982,7 +1002,7 @@ btnSalvarDraft.addEventListener("click", async () => {
         console.error("Erro ao salvar draft:", erro);
         mostrarFeedback("Erro ao salvar times. Tente novamente.", "erro");
         btnSalvarDraft.disabled = false;
-        btnSalvarDraft.textContent = "Salvar Times e Avançar para Jogos 🏆";
+        btnSalvarDraft.textContent = "Salvar Times e Aguardar Nomes 🏷️";
     }
 });
 
@@ -1099,54 +1119,116 @@ btnSalvarEdicao.addEventListener("click", async () => {
 // Cada rodada tem N/2 jogos (ou (N-1)/2 se ímpar).
 // Salva em ligas/{ligaId}/jogos/{jogoId}.
 // ─────────────────────────────────────────────────────────────
-async function gerarCalendario(ligaId, times) {
+// numTurnos: 1 = round-robin simples, 2 = turno+returno, etc.
+async function gerarCalendario(ligaId, times, numTurnos = 1) {
     try {
         const { writeBatch: wb } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
         const batch = wb(db);
 
         // Algoritmo de rotação: fixa o primeiro, roda os demais
-        const lista = [...times];
-        let byeTime = null;
+        const listaBase = [...times];
 
         // Se número ímpar de times, adiciona um "bye" (folga)
-        if (lista.length % 2 !== 0) {
-            byeTime = { id: "bye", nome: "Folga", cor: "#555" };
-            lista.push(byeTime);
+        if (listaBase.length % 2 !== 0) {
+            listaBase.push({ id: "bye", nome: "Folga", cor: "#555" });
         }
 
-        const n       = lista.length;
-        const rodadas = n - 1;
+        const n = listaBase.length;
+        const rodadasPorTurno = n - 1;
 
-        for (let r = 0; r < rodadas; r++) {
-            for (let i = 0; i < n / 2; i++) {
-                const timeA = lista[i];
-                const timeB = lista[n - 1 - i];
+        for (let turno = 0; turno < numTurnos; turno++) {
+            // Reinicia a lista na ordem original a cada turno
+            const lista = [...listaBase];
 
-                // Pula jogos contra "bye"
-                if (timeA.id === "bye" || timeB.id === "bye") continue;
+            for (let r = 0; r < rodadasPorTurno; r++) {
+                for (let i = 0; i < n / 2; i++) {
+                    const timeA = lista[i];
+                    const timeB = lista[n - 1 - i];
 
-                const jogoRef = doc(collection(db, "ligas", ligaId, "jogos"));
-                batch.set(jogoRef, {
-                    rodada:  r + 1,
-                    timeA:   { id: timeA.id, nome: timeA.nome, cor: timeA.cor },
-                    timeB:   { id: timeB.id, nome: timeB.nome, cor: timeB.cor },
-                    placarA: null,
-                    placarB: null,
-                    status:  "pendente"
-                });
+                    // Pula jogos contra "bye"
+                    if (timeA.id === "bye" || timeB.id === "bye") continue;
+
+                    const rodadaNum = turno * rodadasPorTurno + r + 1;
+                    const jogoRef = doc(collection(db, "ligas", ligaId, "jogos"));
+                    batch.set(jogoRef, {
+                        rodada:  rodadaNum,
+                        timeA:   { id: timeA.id, nome: timeA.nome, cor: timeA.cor },
+                        timeB:   { id: timeB.id, nome: timeB.nome, cor: timeB.cor },
+                        placarA: null,
+                        placarB: null,
+                        status:  "pendente"
+                    });
+                }
+
+                // Rotaciona: fixa lista[0], rotaciona lista[1..n-1]
+                const ultimo = lista.pop();
+                lista.splice(1, 0, ultimo);
             }
-
-            // Rotaciona: fixa lista[0], rotaciona lista[1..n-1]
-            const ultimo = lista.pop();
-            lista.splice(1, 0, ultimo);
         }
 
+        const totalRodadas = rodadasPorTurno * numTurnos;
         await batch.commit();
-        console.log(`Calendário gerado: ${rodadas} rodadas para ${times.length} times.`);
+        console.log(`Calendário gerado: ${totalRodadas} rodadas (${numTurnos} turno(s)) para ${times.length} times.`);
 
     } catch (erro) {
         console.error("Erro ao gerar calendário:", erro);
         mostrarFeedback("Times salvos, mas erro ao gerar calendário.", "info");
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// confirmarEGerarRodadas(ligaId, ligaNome)
+// Admin clicou "Gerar Rodadas": busca os times já salvos no
+// Firestore, pergunta quantos turnos e gera o calendário.
+// Muda status de "nomes_times" para "ativo".
+// ─────────────────────────────────────────────────────────────
+async function confirmarEGerarRodadas(ligaId, ligaNome) {
+    // Carrega os times salvos
+    let times;
+    try {
+        const snap = await getDocs(collection(db, "ligas", ligaId, "times"));
+        if (snap.empty) {
+            mostrarFeedback("Nenhum time encontrado. Algo deu errado.", "erro");
+            return;
+        }
+        times = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+        mostrarFeedback("Erro ao carregar times.", "erro");
+        return;
+    }
+
+    // Mostra nomes atuais para o admin confirmar
+    const listaNomes = times.map(t => `• ${t.nome}`).join("\n");
+    const nTimes = times.length;
+    const rodadasBase = nTimes % 2 === 0 ? nTimes - 1 : nTimes;
+
+    const respTurnos = prompt(
+        `Liga: ${ligaNome}\n\n` +
+        `Times (${nTimes}):\n${listaNomes}\n\n` +
+        `Quantos turnos no calendário?\n` +
+        `• 1 turno  = ${rodadasBase} rodadas\n` +
+        `• 2 turnos = ${rodadasBase * 2} rodadas (turno + returno)\n\n` +
+        `Digite 1, 2, 3...`,
+        "1"
+    );
+    if (respTurnos === null) return; // cancelou
+
+    const numTurnos = Math.max(1, Math.min(10, parseInt(respTurnos) || 1));
+
+    try {
+        mostrarFeedback("Gerando calendário...", "info");
+
+        await gerarCalendario(ligaId, times, numTurnos);
+
+        // Avança status para "ativo"
+        await updateDoc(doc(db, "ligas", ligaId), { status: "ativo" });
+
+        mostrarFeedback(`Calendário gerado! ${numTurnos * rodadasBase} rodadas criadas. 🏆`, "sucesso");
+        await carregarLigasAdmin();
+
+    } catch (e) {
+        console.error("Erro ao gerar rodadas:", e);
+        mostrarFeedback("Erro ao gerar rodadas.", "erro");
     }
 }
 
@@ -1212,7 +1294,7 @@ calTabs.forEach(tab => {
 // abrirCalendario(ligaId, ligaNome)
 // Carrega todos os jogos e abre o modal
 // ─────────────────────────────────────────────────────────────
-async function abrirCalendario(ligaId, ligaNome) {
+async function abrirCalendario(ligaId, ligaNome, abaInicial = "jogos") {
     calState.ligaId   = ligaId;
     calState.ligaNome = ligaNome;
     calState.ehAdmin  = roleAtual === "admin"; // usa roleAtual (Firestore), não usuarioAtual.role (Auth)
@@ -1229,14 +1311,21 @@ async function abrirCalendario(ligaId, ligaNome) {
         calTabAdmin.classList.add("oculto");
     }
 
-    // Garante que a aba "Jogos" está ativa ao abrir
-    calTabs.forEach(t => t.classList.toggle("ativo", t.dataset.tab === "jogos"));
-    calJogosEl.classList.remove("oculto");
-    calClassEl.classList.add("oculto");
-    calTimesEl.classList.add("oculto");
+    // Define qual aba fica ativa ao abrir (padrão: jogos)
+    calTabs.forEach(t => t.classList.toggle("ativo", t.dataset.tab === abaInicial));
+    calJogosEl.classList.toggle("oculto",   abaInicial !== "jogos");
+    calClassEl.classList.toggle("oculto",   abaInicial !== "classificacao");
+    calTimesEl.classList.toggle("oculto",   abaInicial !== "times");
 
     modalCalendario.classList.remove("oculto");
     document.body.style.overflow = "hidden";
+
+    // Se a aba inicial for "times", carrega times direto (sem jogos)
+    if (abaInicial === "times") {
+        calJogosEl.innerHTML = '<p class="draft-carregando">Aguardando geração do calendário.</p>';
+        await carregarTimesParaEditar();
+        return;
+    }
 
     try {
         const q    = query(collection(db, "ligas", ligaId, "jogos"), orderBy("rodada"));
@@ -1275,6 +1364,37 @@ function renderizarJogos() {
     if (calState.jogos.length === 0) {
         calJogosEl.insertAdjacentHTML("beforeend", '<p class="draft-carregando">Nenhum jogo cadastrado.</p>');
         return;
+    }
+
+    // ── Chips de filtro por rodada ──────────────────────────────
+    const rodadasUnicas = [...new Set(calState.jogos.map(j => +j.rodada))]
+        .filter(r => !isNaN(r))
+        .sort((a, b) => a - b);
+
+    if (rodadasUnicas.length > 1) {
+        const filtroDiv = document.createElement("div");
+        filtroDiv.className = "cal-rodada-filtro";
+        filtroDiv.innerHTML =
+            `<button class="cal-rod-chip ativo" data-rod="todas">Todas</button>` +
+            rodadasUnicas.map(r => `<button class="cal-rod-chip" data-rod="${r}">Rod. ${r}</button>`).join("");
+        calJogosEl.appendChild(filtroDiv);
+
+        filtroDiv.addEventListener("click", (e) => {
+            const chip = e.target.closest(".cal-rod-chip");
+            if (!chip) return;
+            filtroDiv.querySelectorAll(".cal-rod-chip").forEach(c => c.classList.remove("ativo"));
+            chip.classList.add("ativo");
+            const rodFiltro = chip.dataset.rod;
+            calJogosEl.querySelectorAll(".cal-rodada").forEach(secao => {
+                if (rodFiltro === "todas") {
+                    secao.style.display = "";
+                } else {
+                    const titulo = secao.querySelector(".cal-rodada-titulo");
+                    secao.style.display =
+                        titulo && titulo.textContent.trim() === `Rodada ${rodFiltro}` ? "" : "none";
+                }
+            });
+        });
     }
 
     // Agrupa por rodada
@@ -1768,19 +1888,29 @@ modalNovoJogo.addEventListener("click", (e) => { if (e.target === modalNovoJogo)
 // Abre o modal e carrega os times nos selects
 async function abrirNovoJogo() {
     // Limpa os campos
-    novoJogoRodada.value = "";
     novoJogoData.value   = "";
     novoJogoHora.value   = "";
     novoJogoLocal.value  = "";
     novoJogoObs.value    = "";
 
-    // Sugestão de rodada: próxima após a última cadastrada
-    if (calState.jogos.length > 0) {
-        const maxRodada = Math.max(...calState.jogos.map(j => +j.rodada || 0));
-        novoJogoRodada.value = maxRodada;
-    } else {
-        novoJogoRodada.value = 1;
-    }
+    // Popula select de rodada com rodadas existentes + nova rodada
+    const rodadasExistentes = [...new Set(calState.jogos.map(j => +j.rodada))]
+        .filter(r => !isNaN(r))
+        .sort((a, b) => a - b);
+    const maxRodada  = rodadasExistentes.length > 0 ? Math.max(...rodadasExistentes) : 0;
+    const novaRodada = maxRodada + 1;
+
+    const opRodadas = rodadasExistentes
+        .map(r => `<option value="${r}">Rodada ${r}</option>`)
+        .join("");
+
+    novoJogoRodada.innerHTML =
+        `<option value="">Selecione a rodada...</option>` +
+        opRodadas +
+        `<option value="${novaRodada}">🆕 Nova — Rodada ${novaRodada}</option>`;
+
+    // Pré-seleciona a nova rodada por padrão
+    novoJogoRodada.value = novaRodada;
 
     // Carrega times (reusa os já carregados ou busca no Firestore)
     let times = timesCarregados;
@@ -1882,9 +2012,10 @@ btnSalvarNovoJogo.addEventListener("click", async () => {
 
 // Estado da view do jogador (separado do calState do admin)
 let vjcState = {
-    ligaId:   null,
-    ligaNome: "",
-    jogos:    []
+    ligaId:     null,
+    ligaNome:   "",
+    ligaStatus: "ativo",
+    jogos:      []
 };
 
 // Referências de DOM da view do jogador
@@ -1936,9 +2067,10 @@ vjcTabs.forEach(tab => {
 // ligaStatus: "ativo" | "playoffs" — controla aba visível
 // ─────────────────────────────────────────────────────────────
 async function abrirViewJogador(ligaId, ligaNome, ligaStatus = "ativo") {
-    vjcState.ligaId   = ligaId;
-    vjcState.ligaNome = ligaNome;
-    vjcState.jogos    = [];
+    vjcState.ligaId     = ligaId;
+    vjcState.ligaNome   = ligaNome;
+    vjcState.ligaStatus = ligaStatus;
+    vjcState.jogos      = [];
 
     // Atualiza nome da liga no topo
     vjcLigaNome.textContent = ligaNome;
@@ -1951,23 +2083,32 @@ async function abrirViewJogador(ligaId, ligaNome, ligaStatus = "ativo") {
     }
 
     // Limpa conteúdo anterior
-    vjcJogosEl.innerHTML      = '<p class="vjc-carregando">Carregando jogos...</p>';
-    vjcTimesEl.innerHTML      = '<p class="vjc-carregando">Carregando times...</p>';
-    vjcClassEl.innerHTML      = '<p class="vjc-carregando">Calculando...</p>';
-    vjcPlayoffsEl.innerHTML   = '<p class="vjc-carregando">Carregando playoffs...</p>';
+    vjcJogosEl.innerHTML    = '<p class="vjc-carregando">Carregando jogos...</p>';
+    vjcTimesEl.innerHTML    = '<p class="vjc-carregando">Carregando times...</p>';
+    vjcClassEl.innerHTML    = '<p class="vjc-carregando">Calculando...</p>';
+    vjcPlayoffsEl.innerHTML = '<p class="vjc-carregando">Carregando playoffs...</p>';
 
-    // Garante aba Jogos ativa
-    vjcTabs.forEach(t => t.classList.toggle("ativo", t.dataset.vjcTab === "jogos"));
-    vjcJogosEl.classList.remove("oculto");
-    vjcTimesEl.classList.add("oculto");
+    // Na fase de nomes, a aba padrão é Times (para o jogador nomear seu time)
+    const abaInicial = ligaStatus === "nomes_times" ? "times" : "jogos";
+
+    // Garante aba correta ativa
+    vjcTabs.forEach(t => t.classList.toggle("ativo", t.dataset.vjcTab === abaInicial));
+    vjcJogosEl.classList.toggle("oculto",   abaInicial !== "jogos");
+    vjcTimesEl.classList.toggle("oculto",   abaInicial !== "times");
     vjcClassEl.classList.add("oculto");
     vjcPlayoffsEl.classList.add("oculto");
 
     // Transição: esconde painel, mostra a view
     painelJogador.classList.add("oculto");
     vjcWrapper.classList.remove("oculto");
-    // Rola para o topo da página
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Fase de nomes: sem jogos ainda, admin ainda está definindo os nomes dos times
+    if (ligaStatus === "nomes_times") {
+        vjcJogosEl.innerHTML = '<p class="vjc-vazio">⏳ O admin ainda está definindo os nomes dos times. O calendário será gerado em breve!</p>';
+        renderizarTimesJogador();
+        return;
+    }
 
     try {
         const q    = query(collection(db, "ligas", ligaId, "jogos"), orderBy("rodada"));
@@ -2111,9 +2252,12 @@ async function renderizarTimesJogador() {
             jogadoresMap[d.id] = d.data();
         });
 
+        // Descobre qual é o time do usuário logado
+        const meuUid = usuarioAtual?.uid || null;
+        const meuTimeId = meuUid && jogadoresMap[meuUid] ? jogadoresMap[meuUid].timeId : null;
+
         // Calcula classificação com os jogos já carregados em vjcState.jogos
         const classificacao = calcularClassificacaoLista(vjcState.jogos);
-        // Cria um mapa timeId → posição (1-based)
         const posMap = {};
         classificacao.forEach((t, i) => { posMap[t.id] = i + 1; });
 
@@ -2173,7 +2317,7 @@ async function renderizarTimesJogador() {
                 : '<span class="vjc-time-sem-jogadores">Nenhum jogador</span>';
 
             return `
-                <div class="vjc-time-card" style="border-top: 3px solid ${time.cor || '#555'}">
+                <div class="vjc-time-card ${meuTimeId === time.id ? "vjc-meu-time" : ""}" style="border-top: 3px solid ${time.cor || '#555'}">
                     <div class="vjc-time-card-header">
                         <div class="vjc-time-card-info">
                             <span class="vjc-time-card-nome" style="color:${time.cor || '#fff'}">${time.nome}</span>

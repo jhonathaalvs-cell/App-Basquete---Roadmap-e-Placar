@@ -1,0 +1,255 @@
+// ─────────────────────────────────────────────────────────────
+// jogadores.js
+// Lista todos os jogadores inscritos nas ligas (ativo, playoffs,
+// encerrado), agrupados por liga. Filtro por liga no topo.
+// Dados: ligas/{ligaId}/times + ligas/{ligaId}/inscricoes
+// ─────────────────────────────────────────────────────────────
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    orderBy,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ─── DOM refs ────────────────────────────────────────────────
+const telaLoading   = document.getElementById("tela-loading");
+const filtrosEl     = document.getElementById("filtros");
+const selectLiga    = document.getElementById("select-liga");
+const listaEl       = document.getElementById("lista-jogadores");
+
+// ─── Estado ──────────────────────────────────────────────────
+// Cada item: { ligaId, ligaNome, ligaStatus, jogadores: [{nome, posicao, timeNome, timeCor}] }
+let todasLigas = [];
+
+// ─────────────────────────────────────────────────────────────
+// PONTO DE ENTRADA
+// ─────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async (usuario) => {
+    if (!usuario) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Garante que o documento users/{uid} existe (para regras do Firestore)
+    try {
+        const snap = await getDoc(doc(db, "users", usuario.uid));
+        if (!snap.exists()) {
+            await setDoc(doc(db, "users", usuario.uid), { role: "jogador" });
+        }
+    } catch (e) { /* ignora */ }
+
+    await carregarJogadores();
+});
+
+// ─────────────────────────────────────────────────────────────
+// carregarJogadores()
+// Busca todas as ligas ativas/playoffs/encerradas e seus jogadores
+// ─────────────────────────────────────────────────────────────
+async function carregarJogadores() {
+    try {
+        // Busca todas as ligas ordenadas por data
+        const ligasSnap = await getDocs(
+            query(collection(db, "ligas"), orderBy("criadoEm", "desc"))
+        );
+
+        // Filtra só ligas com jogadores formados
+        const ligasValidas = ligasSnap.docs.filter(d => {
+            const s = d.data().status;
+            return s === "ativo" || s === "playoffs" || s === "encerrado";
+        });
+
+        if (ligasValidas.length === 0) {
+            telaLoading.textContent = "Nenhuma liga com jogadores ainda.";
+            return;
+        }
+
+        // Para cada liga, carrega times e inscrições em paralelo
+        todasLigas = await Promise.all(ligasValidas.map(async (ligaDoc) => {
+            const ligaId     = ligaDoc.id;
+            const ligaData   = ligaDoc.data();
+            const ligaNome   = ligaData.nome;
+            const ligaStatus = ligaData.status;
+
+            const [timesSnap, inscricoesSnap, jogosSnap] = await Promise.all([
+                getDocs(collection(db, "ligas", ligaId, "times")),
+                getDocs(collection(db, "ligas", ligaId, "inscricoes")),
+                getDocs(collection(db, "ligas", ligaId, "jogos"))
+            ]);
+
+            // Mapa timeId → { nome, cor }
+            const timesMap = {};
+            timesSnap.docs.forEach(d => {
+                timesMap[d.id] = { nome: d.data().nome, cor: d.data().cor };
+            });
+
+            // Mapa timeId → nº de jogos finalizados e vitórias
+            const jogosPorTime    = {};
+            const vitoriasPoTime  = {};
+            jogosSnap.docs.forEach(d => {
+                const jogo = d.data();
+                if (jogo.status !== "finalizado") return;
+                const idA = jogo.timeA?.id;
+                const idB = jogo.timeB?.id;
+                if (idA) jogosPorTime[idA] = (jogosPorTime[idA] || 0) + 1;
+                if (idB) jogosPorTime[idB] = (jogosPorTime[idB] || 0) + 1;
+                // Vitórias
+                const pA = Number(jogo.placarA) || 0;
+                const pB = Number(jogo.placarB) || 0;
+                if (pA > pB && idA) vitoriasPoTime[idA] = (vitoriasPoTime[idA] || 0) + 1;
+                if (pB > pA && idB) vitoriasPoTime[idB] = (vitoriasPoTime[idB] || 0) + 1;
+            });
+
+            // Monta lista de jogadores com dados do time
+            const jogadores = inscricoesSnap.docs.map(d => {
+                const dados  = d.data();
+                const time   = timesMap[dados.timeId] || null;
+                const jogos = jogosPorTime[dados.timeId] || 0;
+                const vit   = vitoriasPoTime[dados.timeId] || 0;
+                return {
+                    uid:         d.id,
+                    nome:        dados.nomeJogador || "Jogador",
+                    posicao:     dados.posicao || "",
+                    timeNome:    time ? time.nome : "Sem time",
+                    timeCor:     time ? time.cor  : "#444",
+                    timeId:      dados.timeId || null,
+                    jogosCount:  jogos,
+                    vitorias:    vit,
+                    pctVitorias: jogos > 0 ? Math.round((vit / jogos) * 100) : null
+                };
+            });
+
+            // Ordena alfabeticamente
+            jogadores.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
+
+            return { ligaId, ligaNome, ligaStatus, jogadores };
+        }));
+
+        // Preenche o select de filtro
+        todasLigas.forEach(liga => {
+            const opt = document.createElement("option");
+            opt.value       = liga.ligaId;
+            opt.textContent = liga.ligaNome;
+            selectLiga.appendChild(opt);
+        });
+
+        telaLoading.classList.add("oculto");
+        filtrosEl.classList.remove("oculto");
+
+        renderizarLista();
+
+        selectLiga.addEventListener("change", renderizarLista);
+
+    } catch (erro) {
+        console.error("Erro ao carregar jogadores:", erro);
+        telaLoading.textContent = "Erro ao carregar jogadores.";
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// renderizarLista()
+// Renderiza as seções de liga com seus cards de jogadores
+// ─────────────────────────────────────────────────────────────
+function renderizarLista() {
+    listaEl.innerHTML = "";
+
+    const filtro = selectLiga.value; // "" = todas
+
+    const ligasFiltradas = filtro
+        ? todasLigas.filter(l => l.ligaId === filtro)
+        : todasLigas;
+
+    if (ligasFiltradas.length === 0 || ligasFiltradas.every(l => l.jogadores.length === 0)) {
+        listaEl.innerHTML = '<p class="jog-vazio">Nenhum jogador encontrado.</p>';
+        return;
+    }
+
+    const statusTexto = {
+        ativo:     "🔴 Em andamento",
+        playoffs:  "⚡ Playoffs",
+        encerrado: "⚫ Encerrado"
+    };
+
+    ligasFiltradas.forEach(liga => {
+        if (liga.jogadores.length === 0) return;
+
+        const secao = document.createElement("div");
+        secao.className = "jog-secao";
+
+        secao.innerHTML = `
+            <div class="jog-secao-titulo">
+                ${liga.ligaNome}
+                <span style="font-size:11px;color:#555;font-weight:400;letter-spacing:0;text-transform:none">
+                    ${statusTexto[liga.ligaStatus] || ""} · ${liga.jogadores.length} jogador${liga.jogadores.length !== 1 ? "es" : ""}
+                </span>
+            </div>
+            <div class="jog-lista-interna">
+                ${liga.jogadores.map((j, i) => `
+                    <div class="jog-card">
+                        <span class="jog-num">${i + 1}</span>
+                        <span class="jog-time-cor" style="background:${j.timeCor}"></span>
+                        <div class="jog-info">
+                            <div class="jog-nome">${j.nome}</div>
+                            <div class="jog-time-nome">${j.timeNome}</div>
+                            ${j.posicao ? `<span class="jog-pos ${posClasse(j.posicao)}">${j.posicao}</span>` : ""}
+                        </div>
+                        <div class="jog-direita">
+                            ${j.pctVitorias !== null
+                                ? `<span class="jog-pct ${pctClasse(j.pctVitorias)}">${j.pctVitorias}%</span>
+                                   <span class="jog-pct-label">vitórias</span>`
+                                : `<span class="jog-pct jog-pct-nd">—</span>
+                                   <span class="jog-pct-label">sem jogos</span>`
+                            }
+                            <span class="jog-inscricoes">${j.jogosCount} ${j.jogosCount === 1 ? "jogo" : "jogos"}</span>
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+
+        // Aplica bordas arredondadas só no primeiro e último card dentro da seção
+        listaEl.appendChild(secao);
+    });
+
+    // Ajusta border-radius dos cards dentro de cada grupo
+    listaEl.querySelectorAll(".jog-lista-interna").forEach(grupo => {
+        const cards = grupo.querySelectorAll(".jog-card");
+        cards.forEach((c, i) => {
+            c.style.borderRadius = "0";
+            if (i === 0 && cards.length === 1) c.style.borderRadius = "12px";
+            else if (i === 0)                  c.style.borderRadius = "12px 12px 0 0";
+            else if (i === cards.length - 1)   c.style.borderRadius = "0 0 12px 12px";
+        });
+    });
+}
+
+// ─────────────────────────────────────────────────────────────
+// pctClasse(pct) → classe CSS de cor para % de vitórias
+// ─────────────────────────────────────────────────────────────
+function pctClasse(pct) {
+    if (pct >= 60) return "jog-pct-alto";
+    if (pct >= 40) return "jog-pct-medio";
+    return "jog-pct-baixo";
+}
+
+// ─────────────────────────────────────────────────────────────
+// posClasse(posicao) → classe CSS de cor
+// ─────────────────────────────────────────────────────────────
+function posClasse(posicao) {
+    const p = posicao.toLowerCase();
+    if (p.includes("armador") && !p.includes("ala"))  return "jog-pos-pg";
+    if (p.includes("ala-armador"))                    return "jog-pos-sg";
+    if (p.includes("ala-pivô") || p.includes("ala-pivo")) return "jog-pos-pf";
+    if (p.includes("ala"))                            return "jog-pos-sf";
+    if (p.includes("pivô") || p.includes("pivo"))     return "jog-pos-c";
+    return "jog-pos-nd";
+}
