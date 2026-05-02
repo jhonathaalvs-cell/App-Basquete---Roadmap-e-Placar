@@ -81,9 +81,14 @@ async function cadastrar() {
         await updateProfile(credencial.user, { displayName: nome });
 
         // ── Cria documento do usuário no Firestore ────────────
-        // Necessário para que as regras de segurança reconheçam
-        // o usuário e permitam leitura das ligas.
-        await setDoc(doc(db, "users", credencial.user.uid), { role: "jogador" });
+        // Tenta criar users/{uid} com role "jogador".
+        // Em try separado: se falhar (ex: delay nas regras), não bloqueia
+        // o cadastro. O liga.js cria o documento automaticamente no primeiro acesso.
+        try {
+            await setDoc(doc(db, "users", credencial.user.uid), { role: "jogador" });
+        } catch (errFirestore) {
+            console.warn("Aviso: não foi possível criar users/{uid} agora. Será criado no primeiro acesso.", errFirestore);
+        }
 
         // ── Envia e-mail de verificação automaticamente ───────
         // O jogador recebe um link no e-mail cadastrado.
