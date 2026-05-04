@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil</title>
     <link rel="stylesheet" href="estilos/perfil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -29,6 +30,9 @@
 
         <!-- Bio -->
         <p id="view-bio" class="view-bio">Nenhuma bio ainda.</p>
+
+        <!-- Redes sociais -->
+        <div id="view-redes" class="view-redes"></div>
 
         <!-- Ações -->
         <div class="view-acoes">
@@ -79,6 +83,34 @@
             </select>
         </div>
 
+        <!-- Redes Sociais -->
+        <div class="campo-edit">
+            <label>Redes Sociais</label>
+            <div class="redes-edit-lista">
+
+                <div class="rede-edit-item">
+                    <span class="rede-label rede-instagram"><i class="fa-brands fa-instagram"></i> Instagram</span>
+                    <input type="text" id="edit-instagram" class="input-edit input-rede" placeholder="seu_usuario">
+                </div>
+
+                <div class="rede-edit-item">
+                    <span class="rede-label rede-tiktok"><i class="fa-brands fa-tiktok"></i> TikTok</span>
+                    <input type="text" id="edit-tiktok" class="input-edit input-rede" placeholder="seu_usuario">
+                </div>
+
+                <div class="rede-edit-item">
+                    <span class="rede-label rede-twitter"><i class="fa-brands fa-x-twitter"></i> Twitter/X</span>
+                    <input type="text" id="edit-twitter" class="input-edit input-rede" placeholder="seu_usuario">
+                </div>
+
+                <div class="rede-edit-item">
+                    <span class="rede-label rede-youtube"><i class="fa-brands fa-youtube"></i> YouTube</span>
+                    <input type="text" id="edit-youtube" class="input-edit input-rede" placeholder="seu_canal">
+                </div>
+
+            </div>
+        </div>
+
         <!-- Ações -->
         <div class="edit-acoes">
             <button id="btn-salvar"   class="btn-salvar">Salvar</button>
@@ -91,10 +123,10 @@
     <div id="msg-feedback" class="msg-feedback"></div>
 
     <nav class="nav-bar-bottom">
-        <a href="hub.html" class="link-bottom">Hub</a>
-        <a href="liga.html" class="link-bottom">Liga</a>
-        <a href="jogadores.html" class="link-bottom">👥 Jogadores</a>
-        <a href="perfil.html" class="link-bottom ativo"> Perfil</a>
+        <a href="hub.html" class="link-bottom">HUB</a>
+        <a href="liga.html" class="link-bottom">LIGA</a>
+        <a href="jogadores.html" class="link-bottom"> JOGADORES</a>
+        <a href="perfil.html" class="link-bottom ativo"> PERFIL</a>
     </nav>
 
     <script type="module" src="scripts/perfil.js"></script>

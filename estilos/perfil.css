@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 /* ════════════════════════════════════════════════════
    BASE
@@ -9,8 +9,19 @@
     box-sizing: border-box;
 }
 
+/* ════ PALETA DE CORES */
+
+:root {
+    --cor1:     #2A4759;
+    --cor2:       #8C765A;
+    --cor3: #A66844;
+    --cor4: #260B01;
+    --cor5: #8C452B;
+    --branco: #ededef;
+}
+
 body {
-    background-color: #0d0d0d;
+    background-color: var(--cor4);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -47,43 +58,6 @@ body {
 }
 
 /* ════════════════════════════════════════════════════
-   NAVBAR
-════════════════════════════════════════════════════ */
-.nav-bar {
-    background-color: rgba(0, 0, 0, 0.904);
-    border-radius: 5px;
-    padding: 10px 8px;
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 750px;
-    margin-bottom: 20px;
-}
-
-.link {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    border: 2px solid transparent;
-    border-radius: 20px;
-    padding: 6px 20px;
-    transition: 0.4s;
-}
-
-.link:hover {
-    color: rgb(27, 27, 27);
-    background: rgba(255, 255, 255, 0.493);
-    box-shadow: 0 0 5px rgb(209, 209, 209);
-}
-
-.link.ativo {
-    border-color: #ff8c00;
-    color: #ff8c00;
-}
-
-/* ════════════════════════════════════════════════════
    NAVBAR BOTTOM (fixa na parte de baixo)
 ════════════════════════════════════════════════════ */
 .nav-bar-bottom {
@@ -93,8 +67,8 @@ body {
     transform: translateX(-50%);
     width: 100%;
     max-width: 750px;
-    background-color: rgba(10, 10, 10, 0.97);
-    border-top: 1px solid #222;
+    background-color: var(--cor2);
+    border-top: 1px solid  #8c452b8a;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -103,7 +77,7 @@ body {
 }
 
 .link-bottom {
-    color: #888;
+    color: var(--cor4);
     text-decoration: none;
     font-size: 12px;
     font-weight: 600;
@@ -118,10 +92,12 @@ body {
 
 .link-bottom:hover {
     color: #fff;
+    font-size: 15px;
 }
 
 .link-bottom.ativo {
-    color: #ff8c00;
+    color:var(--cor1);
+    font-weight: bold;
 }
 
 /* Espaço para o conteúdo não ficar atras da nav bottom */
@@ -159,7 +135,7 @@ body {
     position: absolute;
     inset: -4px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff8c00, #ff4500);
+    background: linear-gradient(135deg, #8C765A, #57452e);
     z-index: 0;
 }
 
@@ -168,7 +144,7 @@ body {
     height: 110px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #0d0d0d;
+    border: 3px solid #57452e;
     position: relative;
     z-index: 1;
     display: block;
@@ -214,14 +190,14 @@ body {
 
 .view-email {
     font-size: 13px;
-    color: #888;
+    color: whitesmoke;
     margin-top: -4px;
 }
 
-/* Badge laranja com a posição do jogador */
+/* Badge verde com a posição do jogador */
 .badge-posicao {
-    background: linear-gradient(90deg, #ff8c00, #ff4500);
-    color: white;
+    background: linear-gradient(90deg, #8C765A, #80715d);
+    color: #260B01;
     font-size: 12px;
     font-weight: 600;
     padding: 4px 14px;
@@ -229,15 +205,93 @@ body {
     letter-spacing: 1px;
     margin: 6px 0;
     text-transform: uppercase;
+    padding: 10px;
 }
 
 .view-bio {
     font-size: 14px;
-    color: #ccc;
+    color: white;
     text-align: center;
     max-width: 320px;
     line-height: 1.6;
     padding: 4px 0 10px;
+}
+
+/* ════════════════════════════════════════════════════
+   REDES SOCIAIS — MODO VISUALIZAÇÃO
+════════════════════════════════════════════════════ */
+.view-redes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 4px 0 6px;
+    max-width: 320px;
+}
+
+/* Chip clicável de cada rede */
+.rede-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid color-mix(in srgb, var(--rede-cor) 50%, transparent);
+    color: color-mix(in srgb, var(--rede-cor) 80%, #ededef);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+}
+
+.rede-chip:hover {
+    background: color-mix(in srgb, var(--rede-cor) 20%, transparent);
+    transform: translateY(-1px);
+}
+
+.rede-icone {
+    font-size: 14px;
+}
+
+/* ════════════════════════════════════════════════════
+   REDES SOCIAIS — MODO EDIÇÃO
+════════════════════════════════════════════════════ */
+.redes-edit-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Linha de cada rede: ícone + input lado a lado */
+.rede-edit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Label colorido com nome da rede */
+.rede-label {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.rede-instagram { background: rgba(193, 53, 132, 0.2); color: #e8849e; border: 1px solid rgba(193, 53, 132, 0.4); }
+.rede-tiktok    { background: rgba(237, 237, 239, 0.1); color: #ededef; border: 1px solid rgba(237, 237, 239, 0.3); }
+.rede-twitter   { background: rgba(29, 161, 242, 0.15); color: #7ec8f5; border: 1px solid rgba(29, 161, 242, 0.35); }
+.rede-youtube   { background: rgba(255, 0, 0, 0.15);   color: #f08080; border: 1px solid rgba(255, 0, 0, 0.3); }
+
+/* Input mais compacto para ficar ao lado do label */
+.input-rede {
+    padding: 8px 12px;
+    font-size: 13px;
 }
 
 /* Botões da view */
@@ -253,21 +307,21 @@ body {
     color: #fff;
     padding: 8px 24px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .btn-editar:hover {
-    border-color: #ff8c00;
-    color: #ff8c00;
+    border-color: #2A4759;
+    color: #755831;
 }
 
 .btn-sair {
     background: transparent;
-    border: 1.5px solid #333;
-    color: #888;
+    border: 1.5px solid rgba(166, 190, 173, 0.3);
+    color: #808a9f;
     padding: 8px 20px;
     border-radius: 8px;
     font-size: 14px;
@@ -292,7 +346,7 @@ body {
 
 .campo-edit label {
     font-size: 11px;
-    color: #888;
+    color: whitesmoke;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-weight: 600;
@@ -303,8 +357,8 @@ body {
 
 .input-edit {
     width: 100%;
-    background: #1a1a1a;
-    border: 1.5px solid #333;
+    background: #80715dcc;
+    border: 1.5px solid #2A4759;
     color: #fff;
     padding: 12px 14px;
     border-radius: 8px;
@@ -315,7 +369,7 @@ body {
 
 .input-edit:focus {
     outline: none;
-    border-color: #ff8c00;
+    border-color: #2A4759;
     box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
 }
 
@@ -331,7 +385,7 @@ body {
 }
 
 .select-edit option {
-    background: #1a1a1a;
+    background: #2A4759;
 }
 
 /* Botões do modo edição */
@@ -344,9 +398,9 @@ body {
 
 .btn-salvar {
     flex: 1;
-    background: linear-gradient(90deg, #ff8c00, #ff4500);
+    background: linear-gradient(90deg, #634b2c, #70593ae5);
     border: none;
-    color: white;
+    color: #260B01;
     padding: 13px;
     border-radius: 8px;
     font-size: 14px;
@@ -363,8 +417,8 @@ body {
 .btn-cancelar {
     flex: 1;
     background: transparent;
-    border: 1.5px solid #333;
-    color: #888;
+    border: 1.5px solid rgba(128, 138, 159, 0.3);
+    color: #808a9f;
     padding: 13px;
     border-radius: 8px;
     font-size: 14px;
@@ -374,7 +428,7 @@ body {
 }
 
 .btn-cancelar:hover {
-    border-color: #555;
+    border-color: #5e677a;
     color: #ccc;
 }
 
@@ -392,7 +446,7 @@ body {
 
 .msg-feedback.sucesso { color: #27ae60; }
 .msg-feedback.erro    { color: #c0392b; }
-.msg-feedback.info    { color: #888;    }
+.msg-feedback.info    { color: #808a9f;    }
 
 /* ════════════════════════════════════════════════════
    RESPONSIVIDADE — celulares até 480px

@@ -110,11 +110,20 @@ async function carregarJogadores() {
             });
 
             // Monta lista de jogadores com dados do time
-            const jogadores = inscricoesSnap.docs.map(d => {
+            // Promise.all para buscar o perfil (redes) de cada jogador em paralelo
+            const jogadores = await Promise.all(inscricoesSnap.docs.map(async d => {
                 const dados  = d.data();
                 const time   = timesMap[dados.timeId] || null;
                 const jogos = jogosPorTime[dados.timeId] || 0;
                 const vit   = vitoriasPoTime[dados.timeId] || 0;
+
+                // Busca o perfil do jogador para pegar as redes sociais
+                let redes = {};
+                try {
+                    const perfilSnap = await getDoc(doc(db, "users", d.id));
+                    if (perfilSnap.exists()) redes = perfilSnap.data().redes || {};
+                } catch (e) { /* ignora — rede fica vazia */ }
+
                 return {
                     uid:         d.id,
                     nome:        dados.nomeJogador || "Jogador",
@@ -124,9 +133,10 @@ async function carregarJogadores() {
                     timeId:      dados.timeId || null,
                     jogosCount:  jogos,
                     vitorias:    vit,
-                    pctVitorias: jogos > 0 ? Math.round((vit / jogos) * 100) : null
+                    pctVitorias: jogos > 0 ? Math.round((vit / jogos) * 100) : null,
+                    redes
                 };
-            });
+            }));
 
             // Ordena alfabeticamente
             jogadores.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
@@ -201,6 +211,7 @@ function renderizarLista() {
                             <div class="jog-nome">${j.nome}</div>
                             <div class="jog-time-nome">${j.timeNome}</div>
                             ${j.posicao ? `<span class="jog-pos ${posClasse(j.posicao)}">${j.posicao}</span>` : ""}
+                            ${renderRedesCard(j.redes)}
                         </div>
                         <div class="jog-direita">
                             ${j.pctVitorias !== null
@@ -230,6 +241,26 @@ function renderizarLista() {
             else if (i === cards.length - 1)   c.style.borderRadius = "0 0 12px 12px";
         });
     });
+}
+
+// ─────────────────────────────────────────────────────────────
+// Configuração das redes sociais (mesmo padrão do perfil.js)
+// ─────────────────────────────────────────────────────────────
+const REDES_CONFIG = [
+    { id: "instagram", icone: "fa-brands fa-instagram", label: "Instagram", cor: "#C13584", url: u => `https://instagram.com/${u}` },
+    { id: "tiktok",    icone: "fa-brands fa-tiktok",    label: "TikTok",    cor: "#010101", url: u => `https://tiktok.com/@${u}` },
+    { id: "twitter",   icone: "fa-brands fa-x-twitter", label: "Twitter/X", cor: "#1DA1F2", url: u => `https://twitter.com/${u}` },
+    { id: "youtube",   icone: "fa-brands fa-youtube",   label: "YouTube",   cor: "#FF0000", url: u => `https://youtube.com/@${u}` },
+];
+
+// Retorna o HTML dos chips de redes para um card de jogador
+function renderRedesCard(redes) {
+    if (!redes || Object.keys(redes).length === 0) return "";
+    const chips = REDES_CONFIG
+        .filter(r => redes[r.id])
+        .map(r => `<a class="jog-rede-chip" href="${r.url(redes[r.id])}" target="_blank" rel="noopener noreferrer" title="${r.label}: @${redes[r.id]}" style="--rede-cor:${r.cor}"><i class="${r.icone}"></i></a>`)
+        .join("");
+    return `<div class="jog-redes">${chips}</div>`;
 }
 
 // ─────────────────────────────────────────────────────────────

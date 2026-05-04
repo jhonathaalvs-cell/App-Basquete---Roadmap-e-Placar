@@ -6,6 +6,18 @@
     box-sizing: border-box;
 }
 
+
+/* ════ PALETA DE CORES */
+
+:root {
+    --cor1:     #2A4759;
+    --cor2:       #8C765A;
+    --cor3: #A66844;
+    --cor4: #260B01;
+    --cor5: #8C452B;
+    --branco: #ededef;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -24,7 +36,7 @@ section {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: white;
+    background-color:var(--cor1);
     padding: 30px;
     width: 100%;
     max-width: 450px;
@@ -34,6 +46,7 @@ section {
 h1 {
     text-align: center;
     padding: 20px;
+    color: #c7c5c5;
 }
 
 .campo {
@@ -53,6 +66,7 @@ h1 {
 .campo label {
     width: 100%;
     margin-bottom: 2px;
+    color:#ebebeb;
 }
 
 .campo input {
@@ -61,20 +75,21 @@ h1 {
     text-align: center;
     background: transparent;
     border: none;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--cor4);
+    color: rgb(255, 255, 255);
 }
 
 .campo input:focus {
     outline: none;
-    border-bottom: 3px solid #333;
+    border-bottom: 3px solid #c7c5c5;
     transition: 0.3s;
 }
 
 button {
     margin: 20px 0 10px 0;
-    background-color: #838d8d;
+    background-color: #c7c5c5;
     border: none;
-    color: white;
+    color:var(--cor1);
     font-size: 15px;
     font-weight: 500;
     border-radius: 10px;
@@ -85,20 +100,24 @@ button {
 }
 
 button:hover {
-    background-color: #e48b16;
+    background-color: x 0;
+    background-color: #c7c5c554;
+    color: white;
 }
 
 p {
     text-align: center;
-    color: black;
+    color: x 0;
     font-size: 14px;
     margin: 5px 0;
+    color: aliceblue;
 }
 
 a {
     font-size: 14px;
     margin-left: 5px;
-    color: #0d65e9;
+    color: x 0;
+color: #dbe9f1dc;
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
@@ -106,7 +125,7 @@ a {
 
 a:hover {
     text-decoration: underline;
-    color: #e48b16;
+    color: #94bdd6;
 }
 
 /* Mensagem de feedback do formulário de cadastro */

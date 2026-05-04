@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 /* ════════════════════════════════════════════════════
    BASE
@@ -9,14 +9,32 @@
     box-sizing: border-box;
 }
 
-body {
-    background-color: #0d0d0d;
-    min-height: 100vh;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    color: #fff;
+
+:root {
+    --cor1: #2A4759;
+    --cor2: #8C765A;
+    --cor3: #A66844;
+    --cor4: #260B01;
+    --cor5: #8C452B;
+    --branco: #ededef;
 }
 
-.oculto { display: none !important; }
+html {
+    background-color: var(--cor4);
+    min-height: 100vh;
+    max-width: 750px;
+    width: 100%;
+    /* garante que não transborda em telas menores que 750px */
+    margin: auto;
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    border-radius: 7px;
+}
+
+.oculto {
+    display: none !important;
+}
 
 /* ════════════════════════════════════════════════════
    HEADER
@@ -46,37 +64,41 @@ body {
    NAVBAR
 ════════════════════════════════════════════════════ */
 .nav-bar {
-    background-color: rgba(0, 0, 0, 0.904);
+    background-color: var(--cor2);
     border-radius: 5px;
     padding: 10px 8px;
+    /* padding lateral reduzido para não apertar em mobile */
     display: flex;
     gap: 8px;
+    /* gap menor para caber os 4 links em telas pequenas */
     justify-content: center;
     flex-wrap: wrap;
+    /* se não couber em uma linha, quebra para a próxima */
     width: 100%;
     max-width: 750px;
-    margin: 0 auto 20px;
 }
 
 .link {
-    color: white;
+    color: rgb(51, 3, 3);
     text-decoration: none;
     font-weight: bold;
-    border: 2px solid transparent;
+    border: 5px solid transparent;
     border-radius: 20px;
-    padding: 6px 20px;
+    padding: 8px 20px;
     transition: 0.4s;
 }
 
 .link:hover {
-    color: rgb(27, 27, 27);
-    background: rgba(255, 255, 255, 0.493);
-    box-shadow: 0 0 5px rgb(209, 209, 209);
+    color: rgb(253, 253, 253);
+    background: #8C452B;
+    box-shadow: 0 0 5px #260B01;
+    animation: 0.3s;
 }
 
 .link.ativo {
-    border-color: #ff8c00;
-    color: #ff8c00;
+    color: rgb(253, 253, 253);
+    background: #8C452B;
+    box-shadow: 0 0 5px #260B01;
 }
 
 /* ════════════════════════════════════════════════════
@@ -91,14 +113,14 @@ body {
 
 .jog-loading {
     text-align: center;
-    color: #555;
+    color: white;
     font-size: 14px;
     padding: 60px 0;
 }
 
 .jog-vazio {
     text-align: center;
-    color: #555;
+    color: white;
     font-size: 14px;
     padding: 60px 0;
 }
@@ -114,10 +136,10 @@ body {
 }
 
 .jog-select {
-    background: #161616;
-    border: 1px solid #333;
+    background: var(--cor2);
+    border: 1px solid rgba(128, 138, 159, 0.055);
     border-radius: 10px;
-    color: #ccc;
+    color: var(--cor4);
     font-size: 13px;
     padding: 8px 14px;
     cursor: pointer;
@@ -125,10 +147,11 @@ body {
     transition: border-color 0.2s;
     flex: 1;
     min-width: 180px;
+    margin-top: 10px;
 }
 
 .jog-select:focus {
-    border-color: #ff8c00;
+    border-color: white;
 }
 
 /* ════════════════════════════════════════════════════
@@ -139,11 +162,11 @@ body {
 }
 
 .jog-secao-titulo {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #ff8c00;
+    color: white;
     margin-bottom: 14px;
     padding: 0 4px;
     display: flex;
@@ -155,7 +178,7 @@ body {
     content: "";
     flex: 1;
     height: 1px;
-    background: #222;
+    background: whitesmoke;
 }
 
 /* ════════════════════════════════════════════════════
@@ -171,27 +194,36 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    background: #141414;
-    border: 1px solid #1e1e1e;
+    background: var(--cor2);
+    border: 1px solid #8c765ad0;
     border-radius: 0;
     padding: 14px 16px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid #8C765A;
     transition: background 0.15s;
 }
 
-.jog-card:first-child { border-radius: 12px 12px 0 0; }
-.jog-card:last-child  { border-radius: 0 0 12px 12px; border-bottom: none; }
-.jog-card:only-child  { border-radius: 12px; }
+.jog-card:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.jog-card:last-child {
+    border-radius: 0 0 12px 12px;
+    border-bottom: none;
+}
+
+.jog-card:only-child {
+    border-radius: 12px;
+}
 
 .jog-card:hover {
-    background: #1a1a1a;
+    background: #8C452B;
 }
 
 /* Número do jogador na lista */
 .jog-num {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
-    color: #333;
+    color: var(--cor4);
     min-width: 24px;
     text-align: center;
 }
@@ -211,26 +243,21 @@ body {
 }
 
 .jog-nome {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
-    color: #e8e8e8;
+    color: var(--cor4);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .jog-time-nome {
-    font-size: 12px;
-    color: #666;
+    font-size: 13px;
+    color: #031927;
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-/* Bio do jogador (reservado, não usado atualmente) */
-.jog-bio {
-    display: none;
 }
 
 /* Porcentagem de vitórias */
@@ -240,14 +267,27 @@ body {
     line-height: 1;
     letter-spacing: -0.5px;
 }
-.jog-pct-alto  { color: #69f0ae; }   /* ≥ 60% — verde  */
-.jog-pct-medio { color: #ff8c00; }   /* 40-59% — laranja */
-.jog-pct-baixo { color: #ef9a9a; }   /* < 40% — vermelho */
-.jog-pct-nd    { color: #333; font-size: 16px; }
+
+.jog-pct-alto {
+    color: #06110c;
+}
+
+.jog-pct-medio {
+    color: #06110cd8;
+}
+
+.jog-pct-baixo {
+    color: #b60f92;
+}
+
+.jog-pct-nd {
+    color: rgba(128, 138, 159, 0.5);
+    font-size: 16px;
+}
 
 .jog-pct-label {
-    font-size: 10px;
-    color: #555;
+    font-size: 11px;
+    color: rgb(0, 0, 0);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -263,8 +303,8 @@ body {
 }
 
 .jog-inscricoes {
-    font-size: 11px;
-    color: #444;
+    font-size: 14px;
+    color: #031927;
     white-space: nowrap;
 }
 
@@ -279,19 +319,96 @@ body {
     white-space: nowrap;
 }
 
-/* Cores por posição */
-.jog-pos-pg { color: #4fc3f7; background: rgba(79,195,247,0.1);  border: 1px solid rgba(79,195,247,0.25); }
-.jog-pos-sg { color: #69f0ae; background: rgba(105,240,174,0.1); border: 1px solid rgba(105,240,174,0.25); }
-.jog-pos-sf { color: #ffb74d; background: rgba(255,183,77,0.1);  border: 1px solid rgba(255,183,77,0.25); }
-.jog-pos-pf { color: #ce93d8; background: rgba(206,147,216,0.1); border: 1px solid rgba(206,147,216,0.25); }
-.jog-pos-c  { color: #ef9a9a; background: rgba(239,154,154,0.1); border: 1px solid rgba(239,154,154,0.25); }
-.jog-pos-nd { color: #666;    background: rgba(255,255,255,0.04); border: 1px solid #2a2a2a; }
+/* Redes sociais do jogador — linha de emojis clicáveis */
+.jog-redes {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+/* Cada emoji é um link discreto que fica mais visível ao hover */
+.jog-rede-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(38, 11, 1, 0.4);
+    border: 1px solid rgba(237, 237, 239, 0.2);
+    font-size: 13px;
+    color: color-mix(in srgb, var(--rede-cor, #ededef) 80%, #ededef);
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+}
+
+.jog-rede-chip:hover {
+    background: color-mix(in srgb, var(--rede-cor, #8C452B) 30%, rgba(38,11,1,0.6));
+    transform: scale(1.2);
+    border-color: color-mix(in srgb, var(--rede-cor, #ededef) 60%, transparent);
+}
+
+/* Cores por posição — baseadas na paleta do app */
+
+/* Armador (PG) — azul de --cor1 iluminado */
+.jog-pos-pg {
+    color: #82d8db;
+    background: rgba(4, 12, 17, 0.35);
+    border: 1px solid rgba(4, 16, 24, 0.7);
+}
+
+/* Ala-armador (SG) — --branco suave */
+.jog-pos-sg {
+    color: #ededef;
+    background: rgba(237, 237, 239, 0.12);
+    border: 1px solid rgba(237, 237, 239, 0.35);
+}
+
+/* Ala (SF) — --cor3 iluminado */
+.jog-pos-sf {
+    color: #dfa870;
+    background: rgba(166, 104, 68, 0.25);
+    border: 1px solid rgba(166, 104, 68, 0.55);
+}
+
+/* Ala-pivô (PF) — --cor5 iluminado */
+.jog-pos-pf {
+    color: #e8845e;
+    background: rgba(140, 69, 43, 0.3);
+    border: 1px solid rgba(140, 69, 43, 0.6);
+}
+
+/* Pivô (C) — dourado âmbar que harmoniza com a paleta quente */
+.jog-pos-c {
+    color: #f0c87a;
+    background: rgba(200, 155, 60, 0.2);
+    border: 1px solid rgba(200, 155, 60, 0.45);
+}
+
+/* Sem posição (ND) — neutro discreto */
+.jog-pos-nd {
+    color: rgba(237, 237, 239, 0.35);
+    background: rgba(38, 11, 1, 0.25);
+    border: 1px solid rgba(237, 237, 239, 0.15);
+}
 
 /* ════════════════════════════════════════════════════
    RESPONSIVO
 ════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-    .jog-card { padding: 12px 12px; gap: 10px; }
-    .jog-nome { font-size: 14px; }
-    .jog-pos  { font-size: 10px; padding: 2px 8px; }
+    .jog-card {
+        padding: 12px 12px;
+        gap: 10px;
+    }
+
+    .jog-nome {
+        font-size: 14px;
+    }
+
+    .jog-pos {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
 }

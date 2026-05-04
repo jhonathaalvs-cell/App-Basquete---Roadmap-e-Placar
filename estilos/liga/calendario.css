@@ -1,11 +1,11 @@
-   EDICAO DE JOGOS
+﻿   EDICAO DE JOGOS
    ══════════════════════════════════════════════════════════════ */
 
 /* Botao editar jogo */
 .btn-editar-jogo {
-    background: rgba(255, 255, 255, 0.05);
-    color: #aaa;
-    border: 1px solid #333;
+    background: rgba(140, 118, 90, 0.12);
+    color: rgba(237, 237, 239, 0.7);
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 7px;
     padding: 6px 12px;
     font-size: 12px;
@@ -17,7 +17,7 @@
 }
 
 .btn-editar-jogo:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(140, 118, 90, 0.25);
     color: #fff;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .btn-editar-jogo:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(140, 118, 90, 0.25);
     color: #fff;
 }
 
@@ -62,7 +62,7 @@
 /* Meta: data, hora, local */
 .jogo-meta {
     font-size: 11px;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     margin-top: 6px;
     display: flex;
     gap: 12px;
@@ -72,9 +72,9 @@
 /* Observacoes */
 .jogo-obs {
     font-size: 11px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     background: rgba(255, 255, 255, 0.03);
-    border-left: 2px solid #333;
+    border-left: 2px solid rgba(128, 138, 159, 0.3);
     padding: 4px 8px;
     border-radius: 0 4px 4px 0;
     margin-top: 4px;
@@ -114,9 +114,9 @@
 /* Select estilizado no modal */
 .form-select {
     appearance: none;
-    background-color: #1a1a1a;
+    background-color: rgba(38, 11, 1, 0.85);
     color: #eee;
-    border: 1px solid #333;
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 8px;
     padding: 10px 36px 10px 14px;
     font-size: 14px;
@@ -130,7 +130,7 @@
 
 .form-select:focus {
     outline: none;
-    border-color: #ff8c00;
+    border-color: #ffffff;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -146,8 +146,8 @@
 
 /* Card de time no editor */
 .editor-time-card {
-    background: #111;
-    border: 2px solid #2a2a2a;
+    background: #1a0a02;
+    border: 2px solid rgba(140, 118, 90, 0.45);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -172,7 +172,7 @@
 
 .editor-time-nome:focus {
     outline: none;
-    border-bottom-color: #ff8c00;
+    border-bottom-color: #ffffff;
 }
 
 /* Lista de jogadores no editor */
@@ -204,7 +204,7 @@
     padding: 4px 24px 4px 8px;
     background-position: right 8px center;
     border-radius: 6px;
-    color: #aaa;
+    color: rgba(237, 237, 239, 0.7);
     max-width: 130px;
 }
 
@@ -215,15 +215,15 @@
     flex-wrap: wrap;
     margin-bottom: 16px;
     padding-bottom: 14px;
-    border-bottom: 1px solid #1e1e1e;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.3);
 }
 
 .cal-rod-chip {
     padding: 5px 13px;
     border-radius: 20px;
-    border: 1px solid #2a2a2a;
-    background: #141414;
-    color: #666;
+    border: 1px solid rgba(140, 118, 90, 0.45);
+    background: rgba(44, 11, 1, 0.65);
+    color: rgba(237, 237, 239, 0.4);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -232,13 +232,13 @@
 }
 
 .cal-rod-chip:hover {
-    border-color: #444;
+    border-color: rgba(140, 118, 90, 0.7);
     color: #ccc;
 }
 
 .cal-rod-chip.ativo {
-    background: #ff8c00;
-    border-color: #ff8c00;
+    background: #A66844;
+    border-color: #ffffff;
     color: #000;
 }
 
@@ -249,16 +249,16 @@
     padding: 10px;
     margin-bottom: 14px;
     background: transparent;
-    border: 2px dashed #ff8c00;
+    border: 2px dashed #A66844;
     border-radius: 10px;
-    color: #ff8c00;
+    color: #ffffff;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
 .btn-novo-confronto:hover {
-    background: #ff8c0020;
+    background: #A6684420;
     color: #ffaa44;
 }
 

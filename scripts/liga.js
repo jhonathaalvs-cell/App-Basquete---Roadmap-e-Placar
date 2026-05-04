@@ -613,11 +613,19 @@ btnConfirmarInscricao.addEventListener("click", async () => {
         btnConfirmarInscricao.disabled = true;
         btnConfirmarInscricao.textContent = "Inscrevendo...";
 
+        // Lê a posição do perfil do usuário (salva em users/{uid})
+        let posicaoJogador = "";
+        try {
+            const perfilSnap = await getDoc(doc(db, "users", usuarioAtual.uid));
+            if (perfilSnap.exists()) posicaoJogador = perfilSnap.data().posicao || "";
+        } catch (e) { /* ignora — posição ficará vazia */ }
+
         // Documento: ligas/{ligaId}/inscricoes/{uid}
         await setDoc(doc(db, "ligas", ligaIdAtual, "inscricoes", usuarioAtual.uid), {
             uid:         usuarioAtual.uid,
             nomeJogador: usuarioAtual.displayName || "Sem nome",
             email:       usuarioAtual.email,
+            posicao:     posicaoJogador, // posição do jogador (armador, ala, pivô etc.)
             inscritoEm:  serverTimestamp(),
             timeId:      null // definido pelo admin no Draft (Fase 3)
         });
@@ -1640,6 +1648,9 @@ btnSalvarPlacar.addEventListener("click", async () => {
         renderizarJogos();
         mostrarFeedback("Resultado registrado! ✅", "sucesso");
 
+        // Verifica se todos os jogos da rodada foram finalizados e gera post no Hub
+        await tentarGerarPostRodada(calState.ligaId, calState.ligaNome, jogoLocal.rodada);
+
     } catch (erro) {
         console.error("Erro ao salvar placar:", erro);
         mostrarFeedback("Erro ao salvar resultado.", "erro");
@@ -1648,6 +1659,177 @@ btnSalvarPlacar.addEventListener("click", async () => {
         btnSalvarPlacar.textContent = "Salvar Resultado ✅";
     }
 });
+
+// ─────────────────────────────────────────────────────────────
+// POST AUTOMÁTICO DO HUB
+// Verifica se todos os jogos de uma rodada foram finalizados.
+// Se sim, gera um post narrativo e salva em posts/{id} no Firestore.
+// ─────────────────────────────────────────────────────────────
+
+async function tentarGerarPostRodada(ligaId, ligaNome, rodada) {
+    try {
+        // Pega todos os jogos da mesma rodada
+        const jogosDaRodada = calState.jogos.filter(j => +j.rodada === +rodada);
+
+        // Só gera o post se TODOS os jogos da rodada estiverem finalizados
+        // (ignora cancelados — eles não bloqueiam)
+        const pendentes = jogosDaRodada.filter(j => j.status !== "finalizado" && j.status !== "cancelado");
+        if (pendentes.length > 0) return;
+
+        // Checa se já existe um post para essa rodada/liga para não duplicar
+        const postsSnap = await getDocs(
+            query(collection(db, "posts"), orderBy("criadoEm", "desc"))
+        );
+        const jaExiste = postsSnap.docs.some(d => {
+            const p = d.data();
+            return p.ligaId === ligaId && +p.rodada === +rodada;
+        });
+        if (jaExiste) return;
+
+        // Monta a classificação atual para o post
+        const classificacao = calcularClassificacaoParaPost(calState.jogos);
+
+        // Gera o texto do post
+        const texto = gerarTextoPost(ligaNome, rodada, jogosDaRodada, classificacao);
+
+        // Salva no Firestore — expiraEm define a data de auto-exclusão (14 dias)
+        const expiraEm = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+        await addDoc(collection(db, "posts"), {
+            ligaId,
+            ligaNome,
+            rodada:    +rodada,
+            texto,
+            criadoEm: serverTimestamp(),
+            expiraEm  // data-limite para o Hub apagar automaticamente
+        });
+
+    } catch (e) {
+        console.error("Erro ao gerar post da rodada:", e);
+        // Não exibe erro para o admin — o placar já foi salvo com sucesso
+    }
+}
+
+// ─── Calcula classificação simplificada para usar no post ────
+function calcularClassificacaoParaPost(jogos) {
+    const times = {};
+    jogos.forEach(jogo => {
+        [jogo.timeA, jogo.timeB].forEach(t => {
+            if (t && !times[t.id]) times[t.id] = { nome: t.nome, v: 0, d: 0, pts: 0 };
+        });
+    });
+    jogos.filter(j => j.status === "finalizado").forEach(jogo => {
+        const a = times[jogo.timeA?.id];
+        const b = times[jogo.timeB?.id];
+        if (!a || !b) return;
+        if (jogo.placarA > jogo.placarB) { a.v++; a.pts += 3; b.d++; }
+        else if (jogo.placarB > jogo.placarA) { b.v++; b.pts += 3; a.d++; }
+        else { a.v++; a.pts++; b.v++; b.pts++; }
+    });
+    return Object.values(times).sort((x, y) => y.pts - x.pts || y.v - x.v);
+}
+
+// ─── Gera o texto narrativo completo do post ─────────────────
+function gerarTextoPost(ligaNome, rodada, jogos, classificacao) {
+    const escolher = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    // ── Abertura
+    const aberturas = [
+        `Mais uma rodada acabou e as quadras não mentem!`,
+        `A bola rolou, o suor escorreu e os resultados estão aqui!`,
+        `Rodada encerrada! Veja o que aconteceu nas quadras hoje.`,
+        `Foi jogo! Confira tudo o que rolou nessa rodada.`
+    ];
+
+    // ── Frases por tipo de jogo
+    const frasesEquilibrado = [
+        (v, p, pl) => `Que loucura! ${v} e ${p} foram até o limite — ${pl}. Obra de arte.`,
+        (v, p, pl) => `Jogo de infarto! ${v} garantiu a vitória nos segundos finais. ${pl}.`,
+        (v, p, pl) => `${v} escapou por pouco! ${pl}. O ${p} quase virou isso.`
+    ];
+    const frasesLavada = [
+        (v, p, pl) => `Sem piedade! ${v} atropelou o ${p} por ${pl}. Que lavada.`,
+        (v, p, pl) => `${v} foi outra categoria hoje. ${p} não teve resposta. ${pl}.`,
+        (v, p, pl) => `Jogo resolvido cedo. ${v} dominou do começo ao fim — ${pl}.`
+    ];
+    const frasesNormal = [
+        (v, p, pl) => `${v} venceu o ${p} por ${pl}.`,
+        (v, p, pl) => `Vitória de ${v} sobre ${p}. Placar: ${pl}.`,
+        (v, p, pl) => `${v} garantiu os três pontos diante do ${p}. ${pl}.`
+    ];
+
+    // ── Monta linha de cada jogo
+    const jogosFin = jogos.filter(j => j.status === "finalizado");
+    const linhasJogos = jogosFin.map(j => {
+        const nA  = j.timeA?.nome || "Time A";
+        const nB  = j.timeB?.nome || "Time B";
+        const pA  = j.placarA;
+        const pB  = j.placarB;
+        const vencedor = pA >= pB ? nA : nB;
+        const perdedor = pA >= pB ? nB : nA;
+        const margem   = Math.abs(pA - pB);
+        const placar   = `${Math.max(pA, pB)} x ${Math.min(pA, pB)}`;
+
+        let frase;
+        if (margem <= 5)       frase = escolher(frasesEquilibrado)(vencedor, perdedor, placar);
+        else if (margem >= 20) frase = escolher(frasesLavada)(vencedor, perdedor, placar);
+        else                   frase = escolher(frasesNormal)(vencedor, perdedor, placar);
+
+        return `${nA} ${pA} x ${pB} ${nB} — ${frase}`;
+    });
+
+    // ── Tabela
+    const medalhas = ["1°", "2°", "3°", "4°", "5°", "6°", "7°", "8°"];
+    const linhasTabela = classificacao.map((t, i) =>
+        `${medalhas[i] || `${i + 1}°`} ${t.nome} — ${t.v}V ${t.d}D`
+    );
+
+    // ── Lanternas (2 últimos)
+    const lanternas = classificacao.slice(-2).map(t => t.nome);
+    const frasesLanterna = [
+        `${lanternas[0]} e ${lanternas[1]} ainda estão buscando o ritmo. A temporada é longa!`,
+        `Difícil pra ${lanternas[0]} e ${lanternas[1]} até agora, mas nada que uma sequência boa não resolva.`,
+        `Rodada ${rodada} e ${lanternas[0]} e ${lanternas[1]} ainda em busca da virada. O campeonato ainda não acabou!`,
+        `${lanternas[0]} e ${lanternas[1]} na parte de baixo da tabela por enquanto — mas falta muito jogo ainda.`
+    ];
+
+    // ── Fechamento
+    const lider = classificacao[0]?.nome || "";
+    const liderInvicto = classificacao[0]?.d === 0 && classificacao[0]?.v > 0;
+    const frasesLiderInvicto = [
+        `${lider} segue invicto no topo. Alguém vai parar esse time?`,
+        `${lider} não sabe o que é perder nessa liga. Por enquanto...`
+    ];
+    const frasesDisputado = [
+        `Topo da tabela pegando fogo — qualquer time pode virar líder na próxima rodada!`,
+        `Nada decidido ainda. Vai ser uma luta até o fim!`
+    ];
+
+    const fechamento = liderInvicto
+        ? escolher(frasesLiderInvicto)
+        : escolher(frasesDisputado);
+
+    // ── Monta o texto final
+    const separador = "─────────────────────────";
+    return [
+        `Rodada ${rodada} — ${ligaNome}`,
+        ``,
+        escolher(aberturas),
+        ``,
+        separador,
+        `Resultados`,
+        separador,
+        ...linhasJogos,
+        ``,
+        separador,
+        `Como está a tabela`,
+        separador,
+        ...linhasTabela,
+        ``,
+        lanternas.length >= 2 ? escolher(frasesLanterna) : "",
+        ``,
+        fechamento
+    ].filter(l => l !== undefined).join("\n");
+}
 
 // ─────────────────────────────────────────────────────────────
 // ABA TIMES — editar nomes, mover jogadores entre times

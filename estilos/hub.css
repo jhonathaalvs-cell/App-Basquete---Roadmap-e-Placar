@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 * {
     margin: 0;
@@ -6,10 +6,22 @@
     box-sizing: border-box;
 }
 
-body {
-    background-color: rgba(0, 0, 0, 0.164);
+:root {
+    --cor1: #2A4759;
+    --cor2: #8C765A;
+    --cor3: #A66844;
+    --cor4: #260B01;
+    --cor5: #8C452B;
+    --branco: #ededef;
+}
+
+/* Fundo da página inteira fora do card central */
+html {
+    background-color: var(--cor4);
+    min-height: 100vh;
     max-width: 750px;
-    width: 100%;       /* garante que não transborda em telas menores que 750px */
+    width: 100%;
+    /* garante que não transborda em telas menores que 750px */
     margin: auto;
     min-height: 100vh;
     position: relative;
@@ -25,49 +37,54 @@ body {
 }
 
 header {
-    background-image: rgba(189, 182, 182, 0.904);
+    background-image: rgba(119, 7, 7, 0.904);
     padding-bottom: 15px;
 }
 
 .logo-app {
-    width: 100%;       /* flexível: ocupa o espaço disponível */
+    width: 100%;
+    /* flexível: ocupa o espaço disponível */
     height: auto;
     border-radius: 8px;
     max-width: 300px;
-    min-width: 100px;  /* reduzido para não transbordar em telas de 320px */
+    min-width: 100px;
+    /* reduzido para não transbordar em telas de 320px */
 }
 
 .nav-bar {
-    background-color: rgba(0, 0, 0, 0.904);
+    background-color:var(--cor2);
     border-radius: 5px;
-    padding: 10px 8px;  /* padding lateral reduzido para não apertar em mobile */
+    padding: 10px 8px;
+    /* padding lateral reduzido para não apertar em mobile */
     display: flex;
-    gap: 8px;           /* gap menor para caber os 4 links em telas pequenas */
+    gap: 8px;
+    /* gap menor para caber os 4 links em telas pequenas */
     justify-content: center;
-    flex-wrap: wrap;    /* se não couber em uma linha, quebra para a próxima */
+    flex-wrap: wrap;
+    /* se não couber em uma linha, quebra para a próxima */
     width: 100%;
     max-width: 750px;
 }
 
 .link {
-    color: white;
+    color: rgb(51, 3, 3);
     text-decoration: none;
     font-weight: bold;
-    border: 2px solid transparent;
+    border: 5px solid transparent;
     border-radius: 20px;
-    padding: 6px 20px;
+    padding: 8px 20px;
     transition: 0.4s;
 }
 
 .link:hover {
-    color: rgb(27, 27, 27);
-    background: rgba(255, 255, 255, 0.493);
-    box-shadow: 0 0 5px rgb(209, 209, 209);
+    color: rgb(253, 253, 253);
+    background: #8C452B;
+    box-shadow: 0 0 5px #260B01;
     animation: 0.3s;
 }
 
 .feed-conteiner {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(44, 73, 127, 0.12);
     border: 1px solid rgba(87, 86, 86, 0.788);
     border-radius: 12px;
     padding: 25px;
@@ -86,30 +103,197 @@ header {
     top: 0;
     height: 100%;
     width: 4px;
-    background: rgb(78, 78, 78);
+    background: #2c497f;
 }
 
 .feed-conteiner:hover {
     transform: translatey(-5px);
-    border-color: rgb(0, 0, 0);
-    background: rgba(145, 144, 142, 0.226);
+    border-color: #ccf5ac;
+    background: rgba(44, 73, 127, 0.2);
 }
 
 .feed-conteiner h3 {
-    color: black;
+    color: #f0f0f0;
     font-size: 16px;
     margin: 5px 0;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   MURAL DA QUADRA — Posts automáticos de rodada
+───────────────────────────────────────────────────────────── */
+
+.hub-titulo {
+    color: var(--branco);
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 10px 0 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--cor3);
+    margin-bottom: 16px;
+}
+
+/* Mensagem de carregamento */
+.hub-loading {
+    color: var(--branco);
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.hub-loading.oculto {
+    display: none;
+}
+
+/* Mensagem quando não há posts ainda */
+.hub-vazio {
+    color: var(--branco);
+    text-align: center;
+    padding: 30px 20px;
+    opacity: 0.65;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ── Card de cada post ───────────────────────────────────── */
+.hub-card {
+    background: rgba(44, 11, 1, 0.65);
+    border: 1px solid rgba(166, 104, 68, 0.35);
+    border-left: 4px solid var(--cor3);
+    border-radius: 10px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.hub-card:hover {
+    border-color: var(--cor3);
+    transform: translateY(-3px);
+}
+
+/* ── Cabeçalho do card (nome da liga + número da rodada) ── */
+.hub-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px 10px;
+    background: rgba(140, 69, 43, 0.25);
+    border-bottom: 1px solid rgba(166, 104, 68, 0.25);
+    flex-wrap: wrap;
+}
+
+.hub-liga-nome {
+    color: var(--branco);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.hub-rodada-badge {
+    background: var(--cor5);
+    color: var(--branco);
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* ── Corpo do card ───────────────────────────────────────── */
+.hub-card-corpo {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Título de seção interna (Resultados / Como está a tabela) */
+.hub-secao-titulo {
+    color: var(--cor3);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+/* ── Bloco de resultados ─────────────────────────────────── */
+.hub-resultados {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hub-resultado-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    background: rgba(140, 118, 90, 0.12);
+    border-radius: 8px;
+    border-left: 3px solid var(--cor2);
+}
+
+.hub-confronto {
+    color: var(--branco);
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+.hub-frase-jogo {
+    color: rgba(237, 237, 239, 0.7);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+/* ── Tabela de classificação ─────────────────────────────── */
+.hub-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hub-tabela-linha {
+    color: var(--branco);
+    font-size: 0.88rem;
+    padding: 4px 10px;
+    border-radius: 5px;
+    background: rgba(140, 118, 90, 0.08);
+}
+
+.hub-tabela-linha:first-child {
+    background: rgba(166, 104, 68, 0.2);
+    font-weight: bold;
+}
+
+/* ── Textos narrativos (abertura / lanternas / fechamento) ─ */
+.hub-narrativa {
+    color: rgba(237, 237, 239, 0.85);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+/* ── Rodapé do card (data) ───────────────────────────────── */
+.hub-card-rodape {
+    padding: 8px 16px;
+    text-align: right;
+    font-size: 0.75rem;
+    color: rgba(237, 237, 239, 0.4);
+    border-top: 1px solid rgba(166, 104, 68, 0.12);
+}
+
+
 .feed-conteiner p {
-    color: #5a5858;
+    color: #808a9f;
     font-size: 14px;
     line-height: 1.4;
 }
 
 .time {
     font-size: 10px;
-    color: #666;
+    color: #6e788d;
     display: block;
     margin-top: 10px;
 }
@@ -119,7 +303,8 @@ header {
 ════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
     body {
-        border-radius: 0;   /* remove borda arredondada que cortava o conteúdo */
+        border-radius: 0;
+        /* remove borda arredondada que cortava o conteúdo */
     }
 
     .logo-app {
@@ -127,7 +312,8 @@ header {
     }
 
     .link {
-        padding: 6px 12px;  /* botões da nav menores para caber os 4 */
+        padding: 6px 12px;
+        /* botões da nav menores para caber os 4 */
         font-size: 13px;
     }
 

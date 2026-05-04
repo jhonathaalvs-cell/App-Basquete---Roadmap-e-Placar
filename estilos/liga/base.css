@@ -1,9 +1,9 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    liga.css
-   Estilo da pÃ¡gina de ligas â€” dark theme, consistente com perfil.css
-   Estrutura: header + nav (igual hub) + painÃ©is admin/jogador
+   Estilo da página de ligas â€” dark theme, consistente com perfil.css
+   Estrutura: header + nav (igual hub) + painéis admin/jogador
 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 * {
@@ -12,8 +12,14 @@
     box-sizing: border-box;
 }
 
+/* Fundo da página inteira fora do card central */
+html {
+    background-color: #260B01;
+    min-height: 100vh;
+}
+
 body {
-    background-color: rgba(0, 0, 0, 0.164);
+    background-color: #260B01;
     max-width: 750px;
     width: 100%;
     margin: auto;
@@ -49,7 +55,7 @@ body {
 
 /* â”€â”€â”€ Nav bar (igual ao hub) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .nav-bar {
-    background-color: rgba(0, 0, 0, 0.904);
+    background-color: #8C765A;
     border-radius: 5px;
     padding: 10px 8px;
     display: flex;
@@ -60,7 +66,7 @@ body {
 }
 
 .link {
-    color: #c0c0c0;
+    color: rgb(51, 3, 3);
     text-decoration: none;
     padding: 8px 16px;
     border-radius: 5px;
@@ -72,14 +78,14 @@ body {
 }
 
 .link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #8C452B;
     color: #ffffff;
 }
 
-/* Link da pÃ¡gina atual fica destacado */
+/* Link da página atual fica destacado */
 .link.ativo {
-    background-color: rgba(255, 140, 0, 0.25);
-    color: #ff8c00;
+    background-color: #8C452B;
+    color: #ffffff;
 }
 
 /* â”€â”€â”€ Tela de loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -90,7 +96,7 @@ body {
     justify-content: center;
     gap: 16px;
     padding: 60px 20px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     font-size: 15px;
     width: 100%;
 }
@@ -99,8 +105,8 @@ body {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(255, 140, 0, 0.2);
-    border-top-color: #ff8c00;
+    border: 4px solid rgba(140, 69, 43, 0.25);
+    border-top-color: #ffffff;
     border-radius: 50%;
     animation: girar 0.8s linear infinite;
 }
@@ -109,12 +115,12 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* â”€â”€â”€ Classe utilitÃ¡ria â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Classe utilitária â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .oculto {
     display: none !important;
 }
 
-/* â”€â”€â”€ PainÃ©is (admin e jogador) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Painéis (admin e jogador) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .painel {
     width: 100%;
     max-width: 650px;
@@ -125,26 +131,26 @@ body {
 }
 
 .painel-cabecalho {
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.4);
     padding-bottom: 16px;
 }
 
 .painel-titulo {
     font-size: 22px;
-    color: #f0f0f0;
+    color: #ededef;
     font-weight: 700;
 }
 
 .painel-subtitulo {
     font-size: 14px;
-    color: #777;
+    color: rgba(237, 237, 239, 0.55);
     margin-top: 4px;
 }
 
-/* â”€â”€â”€ BotÃµes principais â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botões principais â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-primario {
-    background-color: #ff8c00;
-    color: #fff;
+    background-color: #8C452B;
+    color: #ededef;
     border: none;
     border-radius: 8px;
     padding: 14px 24px;
@@ -156,7 +162,7 @@ body {
 }
 
 .btn-primario:hover {
-    background-color: #e07b00;
+    background-color: #7a3b24;
 }
 
 .btn-primario:active {
@@ -164,14 +170,14 @@ body {
 }
 
 .btn-primario:disabled {
-    background-color: #555;
+    background-color: rgba(237, 237, 239, 0.2);
     cursor: not-allowed;
 }
 
 .btn-secundario {
     background-color: transparent;
-    color: #aaa;
-    border: 1px solid #444;
+    color: rgba(237, 237, 239, 0.7);
+    border: 1px solid rgba(140, 118, 90, 0.5);
     border-radius: 8px;
     padding: 14px 24px;
     font-size: 15px;
@@ -185,10 +191,10 @@ body {
     color: #fff;
 }
 
-/* â”€â”€â”€ FormulÃ¡rio de nova liga â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Formulário de nova liga â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card-form {
-    background-color: #161616;
-    border: 1px solid #2a2a2a;
+    background-color: rgba(44, 11, 1, 0.65);
+    border: 1px solid rgba(140, 118, 90, 0.45);
     border-radius: 12px;
     padding: 24px 20px;
     display: flex;
@@ -198,23 +204,23 @@ body {
 
 .form-titulo {
     font-size: 17px;
-    color: #e0e0e0;
+    color: #ededef;
     font-weight: 700;
     margin-bottom: 4px;
 }
 
 .form-label {
     font-size: 13px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     margin-bottom: -8px; /* aproxima a label do input */
 }
 
 .form-input {
-    background-color: #1e1e1e;
-    border: 1px solid #333;
+    background-color: rgba(38, 11, 1, 0.85);
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 8px;
     padding: 12px 14px;
-    color: #f0f0f0;
+    color: #ededef;
     font-size: 15px;
     font-family: inherit;
     width: 100%;
@@ -223,7 +229,7 @@ body {
 
 .form-input:focus {
     outline: none;
-    border-color: #ff8c00;
+    border-color: #ffffff;
 }
 
 .form-textarea {
@@ -231,7 +237,7 @@ body {
     min-height: 90px;
 }
 
-/* BotÃµes dentro do formulÃ¡rio ficam lado a lado */
+/* Botões dentro do formulário ficam lado a lado */
 .form-acoes {
     display: flex;
     gap: 12px;
@@ -243,7 +249,7 @@ body {
     flex: 1; /* divide igualmente */
 }
 
-/* â”€â”€â”€ SeÃ§Ã£o de ligas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Seção de ligas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .secao-ligas {
     display: flex;
     flex-direction: column;
@@ -252,7 +258,7 @@ body {
 
 .secao-titulo {
     font-size: 15px;
-    color: #777;
+    color: rgba(237, 237, 239, 0.55);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 600;
@@ -266,7 +272,7 @@ body {
 
 /* Mensagem de estado vazio */
 .msg-vazia {
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     font-size: 14px;
     text-align: center;
     padding: 32px 16px;
@@ -275,8 +281,8 @@ body {
 
 /* â”€â”€â”€ Card de liga â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card-liga {
-    background-color: #141414;
-    border: 1px solid #2a2a2a;
+    background-color: rgba(44, 11, 1, 0.65);
+    border: 1px solid rgba(140, 118, 90, 0.45);
     border-radius: 12px;
     padding: 18px 16px;
     display: flex;
@@ -286,7 +292,7 @@ body {
 }
 
 .card-liga:hover {
-    border-color: #ff8c00;
+    border-color: #ffffff;
 }
 
 .card-cabecalho {
@@ -300,12 +306,12 @@ body {
 .card-nome {
     font-size: 16px;
     font-weight: 700;
-    color: #f0f0f0;
+    color: #ededef;
 }
 
 .card-descricao {
     font-size: 13px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     line-height: 1.5;
 }
 
@@ -314,7 +320,7 @@ body {
     gap: 16px;
     flex-wrap: wrap;
     font-size: 13px;
-    color: #aaa;
+    color: rgba(237, 237, 239, 0.7);
 }
 
 /* â”€â”€â”€ Badge de status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -329,11 +335,11 @@ body {
 /* Cor do badge muda conforme o status da liga */
 .badge-status.inscricoes  { background-color: rgba(0, 200, 80, 0.15);   color: #00c850; }
 .badge-status.draft       { background-color: rgba(255, 200, 0, 0.15);  color: #ffc800; }
-.badge-status.nomes_times { background-color: rgba(255, 140, 0, 0.15);  color: #ff8c00; }
+.badge-status.nomes_times { background-color: rgba(140, 69, 43, 0.2);  color: #ffffff; }
 .badge-status.ativo       { background-color: rgba(255, 60, 60, 0.15);  color: #ff3c3c; }
-.badge-status.encerrado   { background-color: rgba(100, 100, 100, 0.15); color: #888;   }
+.badge-status.encerrado   { background-color: rgba(100, 100, 100, 0.15); color: rgba(237, 237, 239, 0.55);   }
 
-/* â”€â”€â”€ AÃ§Ãµes do card (admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Ações do card (admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card-acoes-admin {
     display: flex;
     align-items: center;
@@ -341,17 +347,17 @@ body {
     flex-wrap: wrap;
     margin-top: 4px;
     padding-top: 10px;
-    border-top: 1px solid #222;
+    border-top: 1px solid rgba(140, 118, 90, 0.4);
 }
 
 /* Contador de inscritos no card do admin */
 .badge-contador {
     font-size: 13px;
-    color: #aaa;
+    color: rgba(237, 237, 239, 0.7);
     font-weight: 600;
 }
 
-/* BotÃ£o "Fechar InscriÃ§Ãµes" no card do admin */
+/* Botão "Fechar Inscrições" no card do admin */
 .btn-fechar-inscricoes {
     background-color: rgba(255, 200, 0, 0.12);
     color: #ffc800;
@@ -369,12 +375,12 @@ body {
     background-color: rgba(255, 200, 0, 0.22);
 }
 
-/* â”€â”€â”€ BotÃ£o "âœï¸ Editar" (Ã­cone, admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botão "✓ï¸ Editar" (ícone, admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-editar-liga {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #333;
+    background: rgba(140, 118, 90, 0.12);
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 7px;
-    color: #aaa;
+    color: rgba(237, 237, 239, 0.7);
     cursor: pointer;
     font-size: 14px;
     padding: 6px 10px;
@@ -383,7 +389,7 @@ body {
 }
 
 .btn-editar-liga:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(140, 118, 90, 0.25);
     color: #fff;
 }
 
@@ -405,7 +411,7 @@ body {
     color: #ff6b6b;
 }
 
-/* â”€â”€â”€ BotÃ£o "Montar Times" (admin, status draft) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botão "Montar Times" (admin, status draft) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-montar-times {
     background-color: rgba(52, 152, 219, 0.14);
     color: #5dade2;
@@ -423,11 +429,11 @@ body {
     background-color: rgba(52, 152, 219, 0.26);
 }
 
-/* â”€â”€â”€ BotÃ£o "Ver Liga" (jogador) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botão "Ver Liga" (jogador) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-inscricao {
-    background-color: rgba(255, 140, 0, 0.12);
-    color: #ff8c00;
-    border: 1px solid rgba(255, 140, 0, 0.3);
+    background-color: rgba(140, 69, 43, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(140, 69, 43, 0.45);
     border-radius: 8px;
     padding: 10px 20px;
     font-size: 14px;
@@ -438,7 +444,7 @@ body {
 }
 
 .btn-inscricao:hover {
-    background-color: rgba(255, 140, 0, 0.22);
+    background-color: rgba(140, 69, 43, 0.28);
 }
 
 /* â”€â”€â”€ Mensagem de feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -447,8 +453,8 @@ body {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1e1e1e;
-    color: #f0f0f0;
+    background-color: rgba(38, 11, 1, 0.85);
+    color: #ededef;
     padding: 14px 24px;
     border-radius: 10px;
     font-size: 14px;
@@ -462,7 +468,7 @@ body {
 
 .msg-feedback.sucesso { border-left-color: #00c850; color: #00c850; }
 .msg-feedback.erro    { border-left-color: #ff3c3c; color: #ff3c3c; }
-.msg-feedback.info    { border-left-color: #ff8c00; color: #ff8c00; }
+.msg-feedback.info    { border-left-color: #ffffff; color: #ffffff; }
 
 /* â”€â”€â”€ Responsividade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 480px) {
@@ -479,12 +485,12 @@ body {
         gap: 6px;
     }
 
-    /* BotÃµes do form empilham em mobile */
+    /* Botões do form empilham em mobile */
     .form-acoes {
         flex-direction: column;
     }
 
-    /* font-size 16px evita zoom automÃ¡tico no iOS ao focar o input */
+    /* font-size 16px evita zoom automático no iOS ao focar o input */
     .form-input {
         font-size: 16px;
     }
@@ -504,7 +510,7 @@ body {
     }
 }
 
-/* â”€â”€â”€ Modal de inscriÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Modal de inscrição â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /* Overlay escuro que cobre toda a tela */
 .modal-overlay {
@@ -520,8 +526,8 @@ body {
 
 /* Caixa branca (escura) do modal */
 .modal-caixa {
-    background-color: #111;
-    border: 1px solid #2a2a2a;
+    background-color: #1a0a02;
+    border: 1px solid rgba(140, 118, 90, 0.45);
     border-radius: 16px;
     width: 100%;
     max-width: 480px;
@@ -531,30 +537,30 @@ body {
     flex-direction: column;
 }
 
-/* Header do modal: tÃ­tulo + botÃ£o fechar */
+/* Header do modal: título + botão fechar */
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 20px 16px;
-    border-bottom: 1px solid #1e1e1e;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.3);
     position: sticky; /* fica fixo no topo ao rolar */
     top: 0;
-    background-color: #111;
+    background-color: #1a0a02;
     z-index: 1;
 }
 
 .modal-titulo {
     font-size: 17px;
     font-weight: 700;
-    color: #f0f0f0;
+    color: #ededef;
 }
 
-/* BotÃ£o âœ• para fechar o modal */
+/* Botão ✓• para fechar o modal */
 .btn-fechar-modal {
     background: none;
     border: none;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     font-size: 20px;
     cursor: pointer;
     padding: 4px 8px;
@@ -565,10 +571,10 @@ body {
 
 .btn-fechar-modal:hover {
     color: #fff;
-    background-color: rgba(255,255,255,0.08);
+    background-color: rgba(140, 118, 90, 0.15);
 }
 
-/* Corpo do modal (scroll interno se necessÃ¡rio) */
+/* Corpo do modal (scroll interno se necessário) */
 .modal-corpo {
     padding: 20px;
     display: flex;
@@ -576,17 +582,17 @@ body {
     gap: 16px;
 }
 
-/* Texto introdutÃ³rio do checklist */
+/* Texto introdutório do checklist */
 .checklist-titulo {
     font-size: 15px;
     font-weight: 700;
-    color: #e0e0e0;
+    color: #ededef;
 }
 
 .checklist-subtitulo {
     font-size: 13px;
-    color: #666;
-    margin-top: -10px; /* aproxima do tÃ­tulo */
+    color: rgba(237, 237, 239, 0.4);
+    margin-top: -10px; /* aproxima do título */
 }
 
 /* Lista de itens do checklist */
@@ -599,7 +605,7 @@ body {
 
 /* Texto de carregamento antes dos itens aparecerem */
 .checklist-carregando {
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     font-size: 14px;
     text-align: center;
     padding: 16px 0;
@@ -610,8 +616,8 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background-color: #161616;
-    border: 1px solid #222;
+    background-color: rgba(44, 11, 1, 0.65);
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 10px;
     padding: 14px 14px;
     transition: border-color 0.2s;
@@ -627,7 +633,7 @@ body {
     border-color: rgba(255, 60, 60, 0.25);
 }
 
-/* Emoji âœ… / âŒ */
+/* Emoji ✓… / âŒ */
 .check-icone {
     font-size: 18px;
     flex-shrink: 0;
@@ -643,19 +649,19 @@ body {
 
 .check-texto strong {
     font-size: 14px;
-    color: #e0e0e0;
+    color: #ededef;
 }
 
 .check-texto span {
     font-size: 13px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
 }
 
-/* BotÃ£o "Reenviar verificaÃ§Ã£o" dentro do item de e-mail */
+/* Botão "Reenviar verificação" dentro do item de e-mail */
 .btn-reenviar-email {
     background-color: transparent;
-    border: 1px solid #444;
-    color: #aaa;
+    border: 1px solid rgba(140, 118, 90, 0.5);
+    color: rgba(237, 237, 239, 0.7);
     border-radius: 6px;
     padding: 6px 12px;
     font-size: 12px;
@@ -666,7 +672,7 @@ body {
 }
 
 .btn-reenviar-email:hover {
-    background-color: rgba(255,255,255,0.08);
+    background-color: rgba(140, 118, 90, 0.15);
     color: #fff;
 }
 
@@ -678,7 +684,7 @@ body {
 
 /* Link "Ir para o Perfil â†’" dentro do item */
 .link-checklist {
-    color: #ff8c00;
+    color: #ffffff;
     font-size: 13px;
     text-decoration: none;
     margin-top: 4px;
@@ -689,7 +695,7 @@ body {
     text-decoration: underline;
 }
 
-/* Estado "jÃ¡ inscrito" â€” aparece no modal se o usuÃ¡rio jÃ¡ se inscreveu */
+/* Estado "já inscrito" â€” aparece no modal se o usuário já se inscreveu */
 .estado-inscrito {
     display: flex;
     flex-direction: column;
@@ -707,14 +713,14 @@ body {
 
 .inscrito-info {
     font-size: 13px;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     line-height: 1.5;
 }
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════════
    FASE 3 â€” DRAFT: MODAL E COMPONENTES
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════════════════════ */
 
 /* Modal mais largo para o draft */
 .modal-caixa-larga {
@@ -722,18 +728,18 @@ body {
     width: 95%;
 }
 
-/* SeÃ§Ã£o de tÃ­tulo dentro do modal */
+/* Seção de título dentro do modal */
 .draft-secao-titulo {
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     margin-bottom: 8px;
     margin-top: 4px;
 }
 
-/* Linha de controles: input qtd + botÃµes */
+/* Linha de controles: input qtd + botões */
 .draft-controles {
     display: flex;
     align-items: center;
@@ -750,8 +756,8 @@ body {
 
 /* Input pequeno para nÃºmero de times */
 .form-input-pequeno {
-    background: #1a1a1a;
-    border: 1px solid #333;
+    background: rgba(38, 11, 1, 0.85);
+    border: 1px solid rgba(140, 118, 90, 0.4);
     border-radius: 8px;
     color: #eee;
     font-size: 14px;
@@ -763,10 +769,10 @@ body {
 
 .form-input-pequeno:focus {
     outline: none;
-    border-color: #ff8c00;
+    border-color: #ffffff;
 }
 
-/* BotÃ£o Auto Draft */
+/* Botão Auto Draft */
 .btn-auto-draft {
     background-color: rgba(255, 200, 0, 0.12);
     color: #ffc800;
@@ -783,14 +789,14 @@ body {
     background-color: rgba(255, 200, 0, 0.22);
 }
 
-/* Separador horizontal entre seÃ§Ãµes do modal */
+/* Separador horizontal entre seções do modal */
 .draft-separador {
     border: none;
-    border-top: 1px solid #2a2a2a;
+    border-top: 1px solid rgba(140, 118, 90, 0.45);
     margin: 16px 0;
 }
 
-/* â”€â”€â”€ Chips dos jogadores disponÃ­veis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Chips dos jogadores disponíveis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .draft-jogadores-container {
     display: flex;
     flex-wrap: wrap;
@@ -803,7 +809,7 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #1e1e1e;
+    background: rgba(38, 11, 1, 0.85);
     border: 1px solid #383838;
     border-radius: 20px;
     padding: 6px 14px;
@@ -813,15 +819,15 @@ body {
 }
 
 .chip-jogador:hover {
-    border-color: #ff8c00;
+    border-color: #ffffff;
     background: #2a2117;
 }
 
 /* Chip atualmente selecionado (aguardando time) */
 .chip-jogador.selecionado {
-    border-color: #ff8c00;
-    background: rgba(255, 140, 0, 0.15);
-    box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.3);
+    border-color: #ffffff;
+    background: rgba(140, 69, 43, 0.2);
+    box-shadow: 0 0 0 2px rgba(140, 69, 43, 0.45);
 }
 
 .chip-nome {
@@ -832,7 +838,7 @@ body {
 
 .chip-posicao {
     font-size: 11px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     background: #2a2a2a;
     border-radius: 10px;
     padding: 2px 8px;
@@ -841,7 +847,7 @@ body {
 /* Texto de status (carregando, vazio, etc.) */
 .draft-carregando {
     font-size: 13px;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     font-style: italic;
 }
 
@@ -854,8 +860,8 @@ body {
 }
 
 .card-time {
-    background: #111;
-    border: 2px solid #2a2a2a;
+    background: #1a0a02;
+    border: 2px solid rgba(140, 118, 90, 0.45);
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
@@ -873,10 +879,10 @@ body {
 
 @keyframes pulso-time {
     from { box-shadow: 0 0 0px transparent; }
-    to   { box-shadow: 0 0 8px rgba(255, 140, 0, 0.3); }
+    to   { box-shadow: 0 0 8px rgba(140, 69, 43, 0.45); }
 }
 
-/* CabeÃ§alho colorido do card */
+/* Cabeçalho colorido do card */
 .card-time-header {
     display: flex;
     justify-content: space-between;
@@ -892,7 +898,7 @@ body {
 
 .card-time-vagas {
     font-size: 11px;
-    color: #aaa;
+    color: rgba(237, 237, 239, 0.7);
 }
 
 .card-time-vagas.cheio {
@@ -910,7 +916,7 @@ body {
 
 .time-vazio {
     font-size: 12px;
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     font-style: italic;
 }
 
@@ -928,8 +934,8 @@ body {
 
 .time-jogador-pos {
     font-size: 11px;
-    color: #888;
-    background: #1e1e1e;
+    color: rgba(237, 237, 239, 0.55);
+    background: rgba(38, 11, 1, 0.85);
     border-radius: 8px;
     padding: 2px 6px;
 }
@@ -937,7 +943,7 @@ body {
 .btn-remover-jogador {
     background: none;
     border: none;
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     cursor: pointer;
     font-size: 12px;
     padding: 2px 4px;
@@ -951,17 +957,17 @@ body {
     background: rgba(231, 76, 60, 0.1);
 }
 
-/* â”€â”€â”€ BotÃ£o Salvar Draft â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botão Salvar Draft â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-salvar-draft {
     margin-top: 8px;
 }
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   FASE 4 â€” CALENDÃRIO, PLACAR E CLASSIFICAÃ‡ÃƒO
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ══════════════════════════════════════════════════════════════
+   FASE 4 â€” CALENDÃRIO, PLACAR E CLASSIFICAÇÃƒO
+   ══════════════════════════════════════════════════════════════ */
 
-/* â”€â”€â”€ BotÃ£o CalendÃ¡rio e Placar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Botão Calendário e Placar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-ver-calendario {
     background-color: rgba(46, 204, 113, 0.12);
     color: #2ecc71;
@@ -979,12 +985,12 @@ body {
     background-color: rgba(46, 204, 113, 0.22);
 }
 
-/* â”€â”€â”€ Abas do Modal CalendÃ¡rio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Abas do Modal Calendário â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .cal-tabs {
     display: flex;
     gap: 4px;
     margin-bottom: 18px;
-    border-bottom: 1px solid #2a2a2a;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.45);
     padding-bottom: 0;
 }
 
@@ -992,7 +998,7 @@ body {
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -1006,8 +1012,8 @@ body {
 }
 
 .cal-tab.ativo {
-    color: #ff8c00;
-    border-bottom-color: #ff8c00;
+    color: #ffffff;
+    border-bottom-color: #ffffff;
 }
 
 .cal-secao {
@@ -1026,7 +1032,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     margin-bottom: 8px;
 }
 
@@ -1038,8 +1044,8 @@ body {
 
 /* â”€â”€â”€ Card de Jogo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card-jogo {
-    background: #111;
-    border: 1px solid #2a2a2a;
+    background: #1a0a02;
+    border: 1px solid rgba(140, 118, 90, 0.45);
     border-radius: 10px;
     padding: 12px 16px;
     display: flex;
@@ -1072,7 +1078,7 @@ body {
 /* Destaque para o vencedor */
 .jogo-time.vencedor {
     color: #fff;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(140, 118, 90, 0.12);
 }
 
 .jogo-placar {
@@ -1085,23 +1091,23 @@ body {
 }
 
 .placar-sep {
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     margin: 0 4px;
 }
 
 .jogo-pendente {
     font-size: 12px;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     white-space: nowrap;
     min-width: 80px;
     text-align: center;
 }
 
-/* BotÃ£o registrar placar */
+/* Botão registrar placar */
 .btn-registrar-placar {
-    background: rgba(255, 140, 0, 0.1);
-    color: #ff8c00;
-    border: 1px solid rgba(255, 140, 0, 0.3);
+    background: rgba(140, 69, 43, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(140, 69, 43, 0.45);
     border-radius: 7px;
     padding: 6px 12px;
     font-size: 12px;
@@ -1113,7 +1119,7 @@ body {
 }
 
 .btn-registrar-placar:hover {
-    background: rgba(255, 140, 0, 0.22);
+    background: rgba(140, 69, 43, 0.28);
 }
 
 /* â”€â”€â”€ Modal Placar (menor) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -1139,7 +1145,7 @@ body {
 
 .confronto-vs {
     font-size: 20px;
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     font-weight: 700;
 }
 
@@ -1161,7 +1167,7 @@ body {
 
 .placar-label {
     font-size: 12px;
-    color: #888;
+    color: rgba(237, 237, 239, 0.55);
     font-weight: 600;
 }
 
@@ -1175,12 +1181,12 @@ body {
 
 .placar-vs {
     font-size: 22px;
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     font-weight: 700;
     padding-bottom: 10px;
 }
 
-/* â”€â”€â”€ Tabela de ClassificaÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Tabela de Classificação â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tabela-classificacao {
     width: 100%;
     border-collapse: collapse;
@@ -1192,10 +1198,10 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #666;
+    color: rgba(237, 237, 239, 0.4);
     padding: 8px 10px;
     text-align: center;
-    border-bottom: 1px solid #2a2a2a;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.45);
 }
 
 .tabela-classificacao th:nth-child(2) {
@@ -1205,7 +1211,7 @@ body {
 .tabela-classificacao td {
     padding: 10px 10px;
     text-align: center;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid rgba(140, 118, 90, 0.3);
     color: #ccc;
 }
 
@@ -1213,7 +1219,7 @@ body {
     text-align: left;
 }
 
-/* Linha do lÃ­der */
+/* Linha do líder */
 .tabela-classificacao tr.lider td {
     background: rgba(255, 140, 0, 0.06);
     color: #fff;
@@ -1223,7 +1229,7 @@ body {
 .tabela-classificacao .d { color: #e74c3c; }
 .tabela-classificacao .pts { color: #fff; font-weight: 700; font-size: 15px; }
 
-.class-pos { color: #888; font-size: 13px; }
+.class-pos { color: rgba(237, 237, 239, 0.55); font-size: 13px; }
 
 /* Bolinha colorida do time */
 .class-time {
@@ -1241,7 +1247,7 @@ body {
 
 .class-legenda {
     font-size: 11px;
-    color: #555;
+    color: rgba(237, 237, 239, 0.3);
     text-align: center;
     margin-top: 12px;
 }

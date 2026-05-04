@@ -14,7 +14,7 @@
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged, updateProfile, signOut }
     from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { doc, getDoc, setDoc }
+import { doc, getDoc, setDoc, deleteField }
     from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ── Referências aos elementos da página ──────────────────────
@@ -23,12 +23,27 @@ const viewNome    = document.getElementById("view-nome");
 const viewPosicao = document.getElementById("view-posicao");
 const viewBio     = document.getElementById("view-bio");
 const viewEmail   = document.getElementById("view-email");
+const viewRedes   = document.getElementById("view-redes"); // área de redes na view
 
 const editNome    = document.getElementById("edit-nome");
 const editBio     = document.getElementById("edit-bio");
 const editPosicao = document.getElementById("edit-posicao");
 const inputFoto   = document.getElementById("input-foto");
 const editFotoBtn = document.getElementById("edit-foto-btn");
+
+// Inputs das redes sociais no modo de edição
+const editInstagram = document.getElementById("edit-instagram");
+const editTiktok    = document.getElementById("edit-tiktok");
+const editTwitter   = document.getElementById("edit-twitter");
+const editYoutube   = document.getElementById("edit-youtube");
+
+// Configuração de cada rede: id usado no Firestore, ícone Font Awesome e cor do chip
+const REDES = [
+    { id: "instagram", label: "Instagram", icone: "fa-brands fa-instagram", cor: "#C13584" },
+    { id: "tiktok",    label: "TikTok",    icone: "fa-brands fa-tiktok",    cor: "#010101" },
+    { id: "twitter",   label: "Twitter/X", icone: "fa-brands fa-x-twitter", cor: "#1DA1F2" },
+    { id: "youtube",   label: "YouTube",   icone: "fa-brands fa-youtube",   cor: "#FF0000" },
+];
 
 const secaoView   = document.getElementById("secao-view");
 const secaoEdit   = document.getElementById("secao-edit");
@@ -72,9 +87,11 @@ async function carregarPerfil(usuario) {
         const dados = docSnap.data();
         viewBio.textContent     = dados.bio      || "Nenhuma bio ainda.";
         viewPosicao.textContent = dados.posicao  || "—";
+        renderizarRedes(dados.redes || {});
     } else {
         viewBio.textContent     = "Nenhuma bio ainda.";
         viewPosicao.textContent = "—";
+        renderizarRedes({});
     }
 }
 
@@ -88,6 +105,13 @@ function abrirEdicao() {
     const options = Array.from(editPosicao.options);
     const index   = options.findIndex(o => o.value === viewPosicao.textContent);
     if (index >= 0) editPosicao.selectedIndex = index;
+
+    // Pré-preenche os inputs de redes com os valores atuais da view
+    REDES.forEach(rede => {
+        const chip = viewRedes.querySelector(`[data-rede="${rede.id}"]`);
+        const usuario = chip ? chip.dataset.usuario : "";
+        document.getElementById(`edit-${rede.id}`).value = usuario || "";
+    });
 
     secaoView.classList.add("oculto");
     secaoEdit.classList.remove("oculto");
@@ -112,6 +136,23 @@ async function salvarAlteracoes() {
     const novaPosicao = editPosicao.value;
     const arquivo     = inputFoto.files[0];
 
+    // Coleta os @ de cada rede.
+    // Se o campo foi preenchido → salva o valor.
+    // Se o campo foi apagado   → usa deleteField() para remover do Firestore.
+    // (merge:true só adiciona/atualiza, nunca apaga — por isso precisamos de deleteField)
+    const novasRedes = {};
+    const redesParaExibir = {}; // versão sem deleteField() para renderizar na tela
+    REDES.forEach(rede => {
+        const valor = document.getElementById(`edit-${rede.id}`).value.trim().replace(/^@/, "");
+        if (valor) {
+            novasRedes[rede.id]      = valor;
+            redesParaExibir[rede.id] = valor;
+        } else {
+            // Campo vazio = apaga o campo no Firestore
+            novasRedes[rede.id] = deleteField();
+        }
+    });
+
     if (!novoNome) {
         mostrarFeedback("O apelido não pode ficar vazio.", "erro");
         return;
@@ -133,16 +174,18 @@ async function salvarAlteracoes() {
         // ── Atualiza nome no Firebase Auth ────────────────────
         await updateProfile(usuarioAtual, { displayName: novoNome });
 
-        // ── Salva bio e posição no Firestore ──────────────────
+        // ── Salva bio, posição e redes no Firestore ────────────────────
         await setDoc(doc(db, "users", usuarioAtual.uid), {
             bio:     novaBio,
-            posicao: novaPosicao
+            posicao: novaPosicao,
+            redes:   novasRedes
         }, { merge: true });
 
-        // ── Atualiza a view ───────────────────────────────────
+        // ── Atualiza a view ──────────────────────────────────
         viewNome.textContent    = novoNome;
         viewBio.textContent     = novaBio     || "Nenhuma bio ainda.";
         viewPosicao.textContent = novaPosicao || "—";
+        renderizarRedes(redesParaExibir);
 
         secaoEdit.classList.add("oculto");
         secaoView.classList.remove("oculto");
@@ -153,6 +196,42 @@ async function salvarAlteracoes() {
         console.error(erro);
         mostrarFeedback("Erro ao salvar. Tente novamente.", "erro");
     }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Renderiza os chips de redes sociais na view
+// redes = { instagram: "usuario", tiktok: "usuario", ... }
+// ─────────────────────────────────────────────────────────────
+function renderizarRedes(redes) {
+    viewRedes.innerHTML = "";
+
+    const redesPreenchidas = REDES.filter(r => redes[r.id]);
+
+    if (redesPreenchidas.length === 0) return;
+
+    redesPreenchidas.forEach(rede => {
+        const chip = document.createElement("a");
+        chip.className       = "rede-chip";
+        chip.dataset.rede    = rede.id;
+        chip.dataset.usuario = redes[rede.id];
+        chip.href   = gerarLink(rede.id, redes[rede.id]);
+        chip.target = "_blank";
+        chip.rel    = "noopener noreferrer";
+        chip.style.setProperty("--rede-cor", rede.cor);
+        chip.innerHTML = `<i class="${rede.icone} rede-icone"></i>@${redes[rede.id]}`;
+        viewRedes.appendChild(chip);
+    });
+}
+
+// Gera o link da rede social a partir do @usuario
+function gerarLink(redeId, usuario) {
+    const links = {
+        instagram: `https://instagram.com/${usuario}`,
+        tiktok:    `https://tiktok.com/@${usuario}`,
+        twitter:   `https://twitter.com/${usuario}`,
+        youtube:   `https://youtube.com/@${usuario}`,
+    };
+    return links[redeId] || "#";
 }
 
 // ─────────────────────────────────────────────────────────────
