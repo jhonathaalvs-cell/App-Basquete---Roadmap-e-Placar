@@ -48,6 +48,11 @@ function traduzirErro(codigoFirebase) {
 // Função principal de cadastro
 // ─────────────────────────────────────────────────────────────
 async function cadastrar() {
+    const btn = document.getElementById("btn-cadastrar");
+
+    // Impede duplo-clique: desabilita o botão durante toda a operação
+    btn.disabled = true;
+
     const nome      = document.getElementById("input-nome").value.trim();
     const email     = document.getElementById("input-email").value.trim();
     const senha     = document.getElementById("input-senha").value;
@@ -59,14 +64,17 @@ async function cadastrar() {
     // ── Validações no front antes de chamar o Firebase ──────
     if (!nome || !email || !senha || !confirmar) {
         exibirErro("Preencha todos os campos.");
+        btn.disabled = false; // libera o botão para nova tentativa
         return;
     }
     if (senha.length < 6) {
         exibirErro("A senha deve ter pelo menos 6 caracteres.");
+        btn.disabled = false;
         return;
     }
     if (senha !== confirmar) {
         exibirErro("As senhas não conferem.");
+        btn.disabled = false;
         return;
     }
 
@@ -107,6 +115,7 @@ async function cadastrar() {
     } catch (erro) {
         // erro.code vem do Firebase (ex: "auth/email-already-in-use")
         exibirErro(traduzirErro(erro.code));
+        btn.disabled = false; // libera o botão para o usuário corrigir e tentar de novo
     }
 }
 
