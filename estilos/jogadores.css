@@ -66,14 +66,11 @@ html {
 .nav-bar {
     background-color: var(--cor2);
     border-radius: 5px;
-    padding: 10px 8px;
-    /* padding lateral reduzido para não apertar em mobile */
+    padding: 6px 8px;
     display: flex;
-    gap: 8px;
-    /* gap menor para caber os 4 links em telas pequenas */
+    gap: 4px;
     justify-content: center;
-    flex-wrap: wrap;
-    /* se não couber em uma linha, quebra para a próxima */
+    flex-wrap: nowrap; /* mantém tudo em uma única linha */
     width: 100%;
     max-width: 750px;
 }
@@ -84,7 +81,10 @@ html {
     font-weight: bold;
     border: 5px solid transparent;
     border-radius: 20px;
-    padding: 8px 20px;
+    padding: 8px 0;
+    flex: 1;            /* cada link ocupa espaço igual na linha */
+    text-align: center; /* centraliza o texto dentro do espaço */
+    white-space: nowrap;
     transition: 0.4s;
 }
 
