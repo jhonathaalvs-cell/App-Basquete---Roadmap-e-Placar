@@ -101,11 +101,16 @@ async function cadastrar() {
         // ── Envia e-mail de verificação automaticamente ───────
         // O jogador recebe um link no e-mail cadastrado.
         // Enquanto não clicar, emailVerified = false no checklist da liga.
-        await sendEmailVerification(credencial.user, {
-            url: window.location.origin + "/liga.html" // volta para liga após verificar
-        });
+        // Se falhar, não bloqueia o cadastro — o usuário pode fazer login mesmo assim.
+        try {
+            await sendEmailVerification(credencial.user, {
+                url: window.location.origin + "/liga.html" // volta para liga após verificar
+            });
+        } catch (errEmail) {
+            console.warn("Aviso: não foi possível enviar o e-mail de verificação.", errEmail);
+        }
 
-        exibirSucesso("Conta criada! Verifique seu e-mail antes de entrar. Redirecionando...");
+        exibirSucesso("Conta criada! Redirecionando para login...");
 
         // Aguarda 1,5s para o usuário ler a mensagem, depois vai para o login
         setTimeout(() => {
